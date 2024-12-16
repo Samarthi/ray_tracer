@@ -122,6 +122,12 @@ template <class T> struct Matrix {
   }
 };
 
+int abs(Matrix<int> m) {
+  // TODO: find out if there exists an efficient approach to calculating
+  // determinants
+
+  return 0;
+}
 Matrix<int> inverse(Matrix<int> m) {
   // TODO: check if determinant is non-zero
   // find minors of each element
