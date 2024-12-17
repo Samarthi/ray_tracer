@@ -116,69 +116,100 @@ template <class T> struct Matrix {
     for (int i = 0; i < this->length; i++) {
       for (int j = 0; j < m.width; j++)
         for (int k = 0; k < this->width; k++) {
-          result.p_matrix[i][j] += this->p_matrix[i][k] * m.p_matrix[k][i];
+          result.p_matrix[i][j] += this->p_matrix[i][k] * m.p_matrix[k][j];
         }
     }
   }
 };
 
 int abs(Matrix<int> m) {
-  int result=0;
-  for(int i=0;i<m.width;i++){
-    if(m.length<=3){
-      int inner_det=(m.p_matrix[1][(j+1)%3]*m.p_matrix[2][(j+2)%3]-m.p_matrix[1][(j+2)%m]*m.p_matrix[2][(j+1)%3]);
-      result+=m.p_matrix[0][i]*inner_det;
-    }
-    else{
-      Matrix<int> inner_m={m.length-1,m.width-1,(int**)calloc(m.length-1,sizeof(int*))};
-      for(int j=0;j<m.length-1;j++)
-        inner_m.p_matrix[j]=(int)calloc(m.length-1,sizeof(int));
-      for(int j=1;j<=m.length-1;j++)
-        for(int k=1;k<=m.width-1;k++)
-          inner_m.p_matrix[j-1][i]=m.p_matrix[j][(j+k)%m.width];
-      result+=m.p_matrix[0][i]*abs(inner_m);   
+  int result = 0;
+  for (int j = 0; j < m.width; j++) {
+    if (m.length <= 3) {
+      int inner_det = (m.p_matrix[1][(j + 1) % 3] * m.p_matrix[2][(j + 2) % 3] -
+                       m.p_matrix[1][(j + 2) % 3] * m.p_matrix[2][(j + 1) % 3]);
+      result += m.p_matrix[0][j] * inner_det;
+    } else {
+      Matrix<int> inner_m = {m.length - 1, m.width - 1,
+                             (int **)calloc(m.length - 1, sizeof(int *))};
+      for (int i = 0; i < m.length - 1; i++)
+        inner_m.p_matrix[i] = (int *)calloc(m.length - 1, sizeof(int));
+      for (int i = 1; i <= m.length - 1; i++)
+        for (int k = 1; k <= m.width - 1; k++)
+          inner_m.p_matrix[i - 1][k - 1] = m.p_matrix[i][(j + k) % m.width];
+      result += m.p_matrix[0][j] * abs(inner_m);
     }
   }
   return result;
 }
-Matrix<int> transpose(Matrix<int> m){
-  for(int i=0;i<m.length;i++)
-    for(int j=i+1;j<m.width;j++)
-      std::swap(m.p_matrix[i][j],m.p_matrix[j][i]);
+
+Matrix<int> identity(int n) {
+  Matrix<int> identity = {n, n, (int **)calloc(4, sizeof(int *))};
+  for (int i; i < 4; i++)
+    identity.p_matrix[i] = (int *)calloc(4, sizeof(int));
+  for (int i = 0; i < n; i++)
+    identity.p_matrix[i][i] = 1;
+  return identity;
+}
+
+Matrix<int> transpose(Matrix<int> m) {
+  for (int i = 0; i < m.length; i++)
+    for (int j = i + 1; j < m.width; j++)
+      std::swap(m.p_matrix[i][j], m.p_matrix[j][i]);
   return m;
 }
 
 Matrix<int> inverse(Matrix<int> m) {
-  int det=abs(m);
-  Matrix<int> cofactor={m.length,m.width,(int**)calloc(m.length,sizeof(int*))};
-  for(auto &p_c:cofactor)
-    p_c=(int)calloc(m.width,sizeof(int));
-  if(det){
-    for(int i=0;i<m.length;i++)
-      for(int j=0;j<m.width;j++){
-        Matrix<int> minor={m.length-1,m.width-1,(int**)calloc(m.length,sizeof(int*))};
-        for(auto &p_m:minor)
-          p_m=(int)calloc(m.width-1,sizeof(int));
-        //TODO: prove changing order of rows in matrix doesn't change determinant: (seems obvious tho)
-        //creating minor 
-        for(int k=1; k<=m.length-1; k++){
-          int col=0;
-          for(int l=0; l<m.width; l++)
-            if(l==j)
+  int det = abs(m);
+  Matrix<int> cofactor = {m.length, m.width,
+                          (int **)calloc(m.length, sizeof(int *))};
+  for (int i = 0; i < m.length; i++)
+    cofactor.p_matrix[i] = (int *)calloc(m.width, sizeof(int));
+  if (det) {
+    for (int i = 0; i < m.length; i++)
+      for (int j = 0; j < m.width; j++) {
+        Matrix<int> minor = {m.length - 1, m.width - 1,
+                             (int **)calloc(m.length, sizeof(int *))};
+        for (int k = 0; k < m.length - 1; k++)
+          minor.p_matrix[k] = (int *)calloc(m.width - 1, sizeof(int));
+        // creating minor
+        for (int k = 1; k <= m.length - 1; k++) {
+          int col = 0;
+          for (int l = 0; l < m.width; l++) {
+            if (l == j)
               continue;
-            minor.p_matrix[k-1][col++]=m.p_matrix[(i+k)%m.length][l];
+            minor.p_matrix[k - 1][col++] = m.p_matrix[(i + k) % m.length][l];
+          }
         }
-        int min_det=abs(minor);
-        cofactor.p_matrix[i][j]=min_det;
-        if((i+j)&1)
-          cofactor.p_matrix[i][j]*=-1;
+        int min_det = abs(minor);
+        cofactor.p_matrix[i][j] = min_det;
+        if ((i + j) & 1)
+          cofactor.p_matrix[i][j] *= -1;
       }
-    Matrix<int> adjugate=transpose(cofactor);
-    for(auto &row:adjugate)
-      for(auto &cell:row)
-        cell/=det;
-    return adjugate;    
-  }
-  else throw std::invalid_argument<"Matrix not invertible">;
+    Matrix<int> adjugate = transpose(cofactor);
+    for (int i = 0; i < adjugate.length; i++)
+      for (int j = 0; j < adjugate.width; j++)
+        adjugate.p_matrix[i][j] /= det;
+    return adjugate;
+  } else
+    throw std::invalid_argument("Matrix not invertible");
   // find minors of each element
 }
+
+Matrix<int> translate(int x, int y, int z) {
+  Matrix<int> translate_tr = identity(4);
+  translate_tr.p_matrix[0][3] = x;
+  translate_tr.p_matrix[1][3] = y;
+  translate_tr.p_matrix[2][3] = z;
+  return translate_tr;
+}
+
+Matrix<int> scale(int x, int y, int z) {
+  Matrix<int> scale_tr = identity(4);
+  scale_tr.p_matrix[0][0] = x;
+  scale_tr.p_matrix[1][1] = y;
+  scale_tr.p_matrix[2][2] = z;
+  return scale_tr;
+}
+// TODO:implement rot_x, rot_y, rot_z
+Matrix<int> rot_x(float radians) { return identity(4); }
