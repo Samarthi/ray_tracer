@@ -3,25 +3,29 @@
 #include <stdexcept>
 #define EPS 0.00001
 
-struct Tuple {
+struct Tuple
+{
   int dim = 4;
   float *p_v;
 
-  Tuple operator+(Tuple t1) {
+  Tuple operator+(Tuple t1)
+  {
     Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
     for (int i = 0; i < this->dim; ++i)
       r.p_v[i] = this->p_v[i] + t1.p_v[i];
     return r;
   }
 
-  Tuple operator-(Tuple t1) {
+  Tuple operator-(Tuple t1)
+  {
     Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
     for (int i = 0; i < this->dim; ++i)
       r.p_v[i] = this->p_v[i] - t1.p_v[i];
     return r;
   }
 
-  Tuple operator-() {
+  Tuple operator-()
+  {
 
     Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
     for (int i = 0; i < this->dim; ++i)
@@ -29,28 +33,32 @@ struct Tuple {
     return r;
   }
 
-  Tuple operator*(float scalar) {
+  Tuple operator*(float scalar)
+  {
     Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
     for (int i = 0; i < this->dim; ++i)
       r.p_v[i] = this->p_v[i] * scalar;
     return r;
   }
 
-  Tuple operator/(float scalar) {
+  Tuple operator/(float scalar)
+  {
     Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
     for (int i = 0; i < this->dim; ++i)
       r.p_v[i] = this->p_v[i] /= scalar;
     return r;
   }
 };
-float abs(Tuple t) {
+float abs(Tuple t)
+{
   float result = 0;
   for (int i = 0; i < t.dim; i++)
     result += pow(t.p_v[i], 2);
   return sqrt(result);
 }
 
-Tuple norm(Tuple t) {
+Tuple norm(Tuple t)
+{
   float magnitude = abs(t);
   Tuple r = {t.dim, (float *)malloc(sizeof(float) * t.dim)};
   for (int i = 0; i < t.dim; ++i)
@@ -58,14 +66,16 @@ Tuple norm(Tuple t) {
   return r;
 }
 
-float dot(Tuple a, Tuple b) {
+float dot(Tuple a, Tuple b)
+{
   float result = 0;
   for (int i = 0; i < a.dim; i++)
     result += a.p_v[i] * b.p_v[i];
   return result;
 }
 // TODO: decouple cross product from 3 dimensions
-Tuple cross(Tuple a, Tuple b) {
+Tuple cross(Tuple a, Tuple b)
+{
   Tuple r = {a.dim, (float *)malloc(sizeof(float) * a.dim)};
   int mod = a.dim - 1;
   for (int i = 0; i < a.dim; i++)
@@ -74,7 +84,8 @@ Tuple cross(Tuple a, Tuple b) {
   return r;
 }
 
-Tuple point(float *p_v) {
+Tuple point(float *p_v)
+{
   Tuple t = {4, (float *)malloc(sizeof(float) * 4)};
   for (int i = 0; i < 3; i++)
     t.p_v[i] = p_v[i];
@@ -82,18 +93,22 @@ Tuple point(float *p_v) {
   return t;
 }
 
-Tuple vector(float *p_v) {
+Tuple vector(float *p_v)
+{
   Tuple t = {4, (float *)malloc(sizeof(float) * 4)};
   for (int i = 0; i < 3; i++)
     t.p_v[i] = p_v[i];
   t.p_v[3] = 0;
   return t;
 }
-template <class T> struct Matrix {
+template <class T>
+struct Matrix
+{
   int length, width;
   T **p_matrix;
 
-  bool operator==(Matrix m) {
+  bool operator==(Matrix m)
+  {
     if (this->length != m.length)
       return false;
     if (this->width != m.width)
@@ -105,7 +120,8 @@ template <class T> struct Matrix {
     return true;
   }
 
-  Matrix operator*(Matrix m) {
+  Matrix operator*(Matrix m)
+  {
     if (this->width != m.length)
       throw std::invalid_argument("this->width!=m.length");
     Matrix result;
@@ -113,23 +129,30 @@ template <class T> struct Matrix {
     result.width = m.width;
     for (int i = 0; i < result.length; i++)
       result.p_matrix[i] = (T *)calloc(result.width, sizeof(T));
-    for (int i = 0; i < this->length; i++) {
+    for (int i = 0; i < this->length; i++)
+    {
       for (int j = 0; j < m.width; j++)
-        for (int k = 0; k < this->width; k++) {
+        for (int k = 0; k < this->width; k++)
+        {
           result.p_matrix[i][j] += this->p_matrix[i][k] * m.p_matrix[k][j];
         }
     }
   }
 };
 
-int abs(Matrix<int> m) {
+int abs(Matrix<int> m)
+{
   int result = 0;
-  for (int j = 0; j < m.width; j++) {
-    if (m.length <= 3) {
+  for (int j = 0; j < m.width; j++)
+  {
+    if (m.length <= 3)
+    {
       int inner_det = (m.p_matrix[1][(j + 1) % 3] * m.p_matrix[2][(j + 2) % 3] -
                        m.p_matrix[1][(j + 2) % 3] * m.p_matrix[2][(j + 1) % 3]);
       result += m.p_matrix[0][j] * inner_det;
-    } else {
+    }
+    else
+    {
       Matrix<int> inner_m = {m.length - 1, m.width - 1,
                              (int **)calloc(m.length - 1, sizeof(int *))};
       for (int i = 0; i < m.length - 1; i++)
@@ -143,7 +166,8 @@ int abs(Matrix<int> m) {
   return result;
 }
 
-Matrix<int> identity(int n) {
+Matrix<int> identity(int n)
+{
   Matrix<int> identity = {n, n, (int **)calloc(4, sizeof(int *))};
   for (int i; i < 4; i++)
     identity.p_matrix[i] = (int *)calloc(4, sizeof(int));
@@ -152,30 +176,36 @@ Matrix<int> identity(int n) {
   return identity;
 }
 
-Matrix<int> transpose(Matrix<int> m) {
+Matrix<int> transpose(Matrix<int> m)
+{
   for (int i = 0; i < m.length; i++)
     for (int j = i + 1; j < m.width; j++)
       std::swap(m.p_matrix[i][j], m.p_matrix[j][i]);
   return m;
 }
 
-Matrix<int> inverse(Matrix<int> m) {
+Matrix<int> inverse(Matrix<int> m)
+{
   int det = abs(m);
   Matrix<int> cofactor = {m.length, m.width,
                           (int **)calloc(m.length, sizeof(int *))};
   for (int i = 0; i < m.length; i++)
     cofactor.p_matrix[i] = (int *)calloc(m.width, sizeof(int));
-  if (det) {
+  if (det)
+  {
     for (int i = 0; i < m.length; i++)
-      for (int j = 0; j < m.width; j++) {
+      for (int j = 0; j < m.width; j++)
+      {
         Matrix<int> minor = {m.length - 1, m.width - 1,
                              (int **)calloc(m.length, sizeof(int *))};
         for (int k = 0; k < m.length - 1; k++)
           minor.p_matrix[k] = (int *)calloc(m.width - 1, sizeof(int));
         // creating minor
-        for (int k = 1; k <= m.length - 1; k++) {
+        for (int k = 1; k <= m.length - 1; k++)
+        {
           int col = 0;
-          for (int l = 0; l < m.width; l++) {
+          for (int l = 0; l < m.width; l++)
+          {
             if (l == j)
               continue;
             minor.p_matrix[k - 1][col++] = m.p_matrix[(i + k) % m.length][l];
@@ -191,12 +221,14 @@ Matrix<int> inverse(Matrix<int> m) {
       for (int j = 0; j < adjugate.width; j++)
         adjugate.p_matrix[i][j] /= det;
     return adjugate;
-  } else
+  }
+  else
     throw std::invalid_argument("Matrix not invertible");
   // find minors of each element
 }
 
-Matrix<int> translate(int x, int y, int z) {
+Matrix<int> translate(int x, int y, int z)
+{
   Matrix<int> translate_tr = identity(4);
   translate_tr.p_matrix[0][3] = x;
   translate_tr.p_matrix[1][3] = y;
@@ -204,7 +236,8 @@ Matrix<int> translate(int x, int y, int z) {
   return translate_tr;
 }
 
-Matrix<int> scale(int x, int y, int z) {
+Matrix<int> scale(int x, int y, int z)
+{
   Matrix<int> scale_tr = identity(4);
   scale_tr.p_matrix[0][0] = x;
   scale_tr.p_matrix[1][1] = y;
@@ -212,4 +245,7 @@ Matrix<int> scale(int x, int y, int z) {
   return scale_tr;
 }
 // TODO:implement rot_x, rot_y, rot_z
-Matrix<int> rot_x(float radians) { return identity(4); }
+Matrix<int> rot_x(float radians)
+{
+  return identity(4);
+}
