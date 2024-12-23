@@ -7,6 +7,14 @@ struct Tuple {
   int dim = 4;
   float *p_v;
 
+  bool operator==(Tuple t1) {
+    bool result = true;
+    for (int i = 0; i < 4; i++) {
+      result &= (this->p_v[i] == t1.p_v[i]);
+    }
+    return result;
+  }
+
   Tuple operator+(Tuple t1) {
     Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
     for (int i = 0; i < this->dim; ++i)
@@ -142,7 +150,6 @@ int abs(Matrix<int> m) {
   }
   return result;
 }
-
 Matrix<int> identity(int n) {
   Matrix<int> identity = {n, n, (int **)calloc(4, sizeof(int *))};
   for (int i; i < 4; i++)
@@ -151,7 +158,6 @@ Matrix<int> identity(int n) {
     identity.p_matrix[i][i] = 1;
   return identity;
 }
-
 Matrix<int> transpose(Matrix<int> m) {
   for (int i = 0; i < m.length; i++)
     for (int j = i + 1; j < m.width; j++)
