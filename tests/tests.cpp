@@ -33,17 +33,37 @@ void testVectorSubtraction()
 
 void testTupleNegation()
 {
-	float f_a[4] = {1, 2, -3, 4}, f_b[4] = {-1, -2, 3, -4};
+	float f_a[4] = {1, 2, -3, 4}, f_b[4] = {-1, -2, 3,-4};
 	Tuple t={4,f_a};
 	Tuple y=-t;
 	Tuple r={4, f_b};
 	assert(y==r);
-	
 }	
 
+void testTupleScalarMultiplication()
+{
+	float f_a[4] = {1,-2,3,-4}, f_b[4] = {3.5, -7, 10.5, -14};
+	Tuple t = {4,f_a};
+	Tuple y = t*3.5;
+	Tuple r = {4, f_b};
+	assert(y==r);
+}
+
+void testTupleScalarDivision()
+{
+	float f_a[4] = {1,-2,3,-4}, f_b[4] = {0.5, -1, 1.5, -2};
+	Tuple t = {4,f_a};
+	Tuple y = t/2;
+	Tuple r = {4, f_b};
+	assert(y==r);
+}
 int main()
 {
 	testTupleAddition();
 	testTupleSubtraction();
-	testVectorSubtraction();	
+	testVectorSubtraction();
+	testTupleNegation();
+	testTupleScalarMultiplication();
+	testTupleScalarDivision();
+		
 }
