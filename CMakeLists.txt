@@ -17,18 +17,23 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_subdirectory(
-  include
   lib
 )
+
+
 add_executable(
   tests
   tests/tests.cpp
 )
-target_link_libraries(
+set(CMAKE_VERBOSE_MAKEFILE ON)
+target_link_libraries(tests PRIVATE lib)
+target_link_libraries( 
   tests
+  PRIVATE
   GTest::gtest_main
 )
 
+target_include_directories(tests PUBLIC "${PROJECT_SOURCE_DIR}/include")
 include(GoogleTest)
 gtest_discover_tests(tests)
 

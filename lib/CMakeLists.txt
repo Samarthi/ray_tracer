@@ -1,5 +1,5 @@
-add_executable(
+add_library(
   lib
-  "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+  STATIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/tuple.cpp
 )
-target_link_libraries(lib PRIVATE tracer)

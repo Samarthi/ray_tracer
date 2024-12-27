@@ -1,56 +1,52 @@
+#include "../include/tuple.h"
 #include <malloc.h>
 #include <math.h>
 #include <stdexcept>
 #define EPS 0.00001
 
-struct Tuple {
-  int dim = 4;
-  float *p_v;
 
-  bool operator==(Tuple t1) {
-    bool result = true;
-    for (int i = 0; i < 4; i++) {
-      result &= (this->p_v[i] == t1.p_v[i]);
-    }
-    return result;
-  }
+bool Tuple::operator==(Tuple t1) {
+	bool result = true;
+	for (int i = 0; i < 4; i++) 
+	  result &= (this->p_v[i] == t1.p_v[i]);
+	return result;
+}
 
-  Tuple operator+(Tuple t1) {
-    Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
-    for (int i = 0; i < this->dim; ++i)
-      r.p_v[i] = this->p_v[i] + t1.p_v[i];
-    return r;
-  }
+Tuple Tuple::operator+(Tuple t1) {
+	Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
+	for (int i = 0; i < this->dim; ++i)
+	  r.p_v[i] = this->p_v[i] + t1.p_v[i];
+	return r;
+}
 
-  Tuple operator-(Tuple t1) {
-    Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
-    for (int i = 0; i < this->dim; ++i)
-      r.p_v[i] = this->p_v[i] - t1.p_v[i];
-    return r;
-  }
+Tuple Tuple::operator-(Tuple t1) {
+	Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
+	for (int i = 0; i < this->dim; ++i)
+	  r.p_v[i] = this->p_v[i] - t1.p_v[i];
+	return r;
+}
 
-  Tuple operator-() {
+Tuple Tuple::operator-() {
+	Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
+	for (int i = 0; i < this->dim; ++i)
+	  r.p_v[i] = -(this->p_v[i]);
+	return r;
+}
 
-    Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
-    for (int i = 0; i < this->dim; ++i)
-      r.p_v[i] = -(this->p_v[i]);
-    return r;
-  }
+Tuple Tuple::operator*(float scalar) {
+	Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
+	for (int i = 0; i < this->dim; ++i)
+	  r.p_v[i] = this->p_v[i] * scalar;
+	return r;
+}
 
-  Tuple operator*(float scalar) {
-    Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
-    for (int i = 0; i < this->dim; ++i)
-      r.p_v[i] = this->p_v[i] * scalar;
-    return r;
-  }
+Tuple Tuple::operator/(float scalar) {
+	Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
+	for (int i = 0; i < this->dim; ++i)
+	  r.p_v[i] = this->p_v[i] /= scalar;
+	return r;
+}
 
-  Tuple operator/(float scalar) {
-    Tuple r = {this->dim, (float *)malloc(sizeof(float) * this->dim)};
-    for (int i = 0; i < this->dim; ++i)
-      r.p_v[i] = this->p_v[i] /= scalar;
-    return r;
-  }
-};
 float abs(Tuple t) {
   float result = 0;
   for (int i = 0; i < t.dim; i++)
@@ -97,38 +93,35 @@ Tuple vector(float *p_v) {
   t.p_v[3] = 0;
   return t;
 }
-template <class T> struct Matrix {
-  int length, width;
-  T **p_matrix;
+template <typename T>
+bool Matrix<T>::operator==(Matrix<T> m) {
+	if (this->length != m.length)
+	  return false;
+	if (this->width != m.width)
+	  return false;
+	for (int i = 0; i < this->length; i++)
+	  for (int j = 0; j < this->width; j++)
+		if (this->p_matrix[i][j] != m.p_matrix[i][j])
+		  return false;
+	return true;
+}
+template <typename T>
+Matrix<T> Matrix<T>::operator*(Matrix<T> m) {
+	if (this->width != m.length)
+	  throw std::invalid_argument("this->width!=m.length");
+	Matrix result;
+	result.length = this->length;
+	result.width = m.width;
+	for (int i = 0; i < result.length; i++)
+	  result.p_matrix[i] = (T *)calloc(result.width, sizeof(T));
+	for (int i = 0; i < this->length; i++) {
+	  for (int j = 0; j < m.width; j++)
+		for (int k = 0; k < this->width; k++) {
+		  result.p_matrix[i][j] += this->p_matrix[i][k] * m.p_matrix[k][j];
+		}
+	}
+}
 
-  bool operator==(Matrix m) {
-    if (this->length != m.length)
-      return false;
-    if (this->width != m.width)
-      return false;
-    for (int i = 0; i < this->length; i++)
-      for (int j = 0; j < this->width; j++)
-        if (this->p_matrix[i][j] != m.p_matrix[i][j])
-          return false;
-    return true;
-  }
-
-  Matrix operator*(Matrix m) {
-    if (this->width != m.length)
-      throw std::invalid_argument("this->width!=m.length");
-    Matrix result;
-    result.length = this->length;
-    result.width = m.width;
-    for (int i = 0; i < result.length; i++)
-      result.p_matrix[i] = (T *)calloc(result.width, sizeof(T));
-    for (int i = 0; i < this->length; i++) {
-      for (int j = 0; j < m.width; j++)
-        for (int k = 0; k < this->width; k++) {
-          result.p_matrix[i][j] += this->p_matrix[i][k] * m.p_matrix[k][j];
-        }
-    }
-  }
-};
 
 int abs(Matrix<int> m) {
   int result = 0;
