@@ -2,13 +2,17 @@
 #include <malloc.h>
 #include <math.h>
 #include <stdexcept>
-#define EPS 0.00001
+#include <iostream>
+#define EPS 0.001
 
+bool eq(float f1,float f2){
+	return fabs(f1-f2)<=EPS;
+}
 
 bool Tuple::operator==(Tuple t1) {
 	bool result = true;
 	for (int i = 0; i < 4; i++) 
-	  result &= (this->p_v[i] == t1.p_v[i]);
+	  result &= (eq(this->p_v[i] ,t1.p_v[i]));
 	return result;
 }
 
@@ -47,6 +51,12 @@ Tuple Tuple::operator/(float scalar) {
 	return r;
 }
 
+void debug(Tuple t) {
+	char coords[4]={'x','y','z','w'};
+	for(int i=0;i<4;i++)
+		std::cout<<coords[i]<<' '<<t.p_v[i]<<std::endl;
+}
+
 float abs(Tuple t) {
   float result = 0;
   for (int i = 0; i < t.dim; i++)
@@ -70,9 +80,9 @@ float dot(Tuple a, Tuple b) {
 }
 // TODO: decouple cross product from 3 dimensions
 Tuple cross(Tuple a, Tuple b) {
-  Tuple r = {a.dim, (float *)malloc(sizeof(float) * a.dim)};
+  Tuple r = {a.dim, (float *)calloc(sizeof(float),a.dim)};
   int mod = a.dim - 1;
-  for (int i = 0; i < a.dim; i++)
+  for (int i = 0; i < a.dim-1; i++)
     r.p_v[i] = a.p_v[(i + 1) % mod] * b.p_v[(i + 2) % mod] -
                a.p_v[(i + 2) % mod] * b.p_v[(i + 1) % mod];
   return r;
@@ -249,3 +259,5 @@ Matrix<int> shear(int xy, int xz, int yx, int yz, int zx, int zy) {
   shear_tr.p_matrix[2][0] = xz, shear_tr.p_matrix[2][1] = yz;
   return shear_tr;
 }
+
+
