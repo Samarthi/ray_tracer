@@ -1,4 +1,4 @@
-bool eq(float f1,float f2);
+bool eq(float f1, float f2);
 struct Tuple {
   int dim;
   float *p_v;
@@ -9,6 +9,7 @@ struct Tuple {
   Tuple operator*(float scalar);
   Tuple operator/(float scalar);
 };
+Tuple origin();
 void debug(Tuple t);
 float abs(Tuple t);
 Tuple norm(Tuple t);
