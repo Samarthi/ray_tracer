@@ -1,3 +1,4 @@
+#pragma once
 bool eq(float f1, float f2);
 struct Tuple {
   int dim;
@@ -28,9 +29,12 @@ template <typename T> struct Matrix {
   Matrix<T> operator*(Matrix<T> m);
   Matrix<T> operator-();
 };
+Matrix<float> identity(int n);
 template <typename T> Matrix<T> transpose(Matrix<T> m);
 template <typename T> float abs(Matrix<T> M);
 Matrix<Tuple> canvas(int length, int width);
 void canvas_to_ppm(Matrix<Tuple> canvas);
 void write_pixel(Matrix<Tuple> *canvas, int height, int width, Tuple color);
-template <typename T> Matrix<T> tuple_to_matrix(Tuple t);
+Matrix<float> tuple_to_matrix(Tuple t);
+Tuple matrix_to_tuple(Matrix<float> m);
+

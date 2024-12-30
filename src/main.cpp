@@ -1,18 +1,29 @@
 #include "../include/tuple.h"
+#include "../include/ray.h"
 #include <math.h>
+#include <iostream>
 
 int main() {
-  float p[3] = {1.1, 0.0, 3.2}, b[3] = {1.2, 3.2, 4.1};
-  Tuple a = vector(p), d = vector(b);
-  // Tuple c = a + d;
-  a = -a;
+  Tuple r_origin = origin();  
+  r_origin.p_v[2] = -5;
+  float wall_z = 10, wall_size = 7, canvas_size = 100, pixel_size = wall_size/canvas_size, half = wall_size/2 ;
   float black[3] = {0.0, 0.0, 0.0};
-  Matrix m = canvas(1000, 1000);
-  int prev = -1;
-  for (float i = 0; i < 1000; i += 0.8) {
-    int x = i, y = ceil(x * x);
-    while (++prev <= y)
-      write_pixel(&m, x, prev, color(black));
+  Matrix<Tuple> m = canvas(canvas_size, canvas_size);
+  Sphere s = {1,identity(4)};
+
+  for (int i = 0; i < canvas_size; ++i) {
+    float world_y = half - pixel_size * i;
+    for(int j = 0; j < canvas_size; ++j){
+		float world_x = -half + pixel_size * j;
+		float f_position[3] = {world_x, world_y, wall_z};
+		Tuple t_position = point(f_position);
+		Tuple direction = norm(t_position - r_origin);
+		Ray r= {r_origin, norm( t_position - r_origin )};
+		std::vector<Intersection>* intersection_list = intersect_sphere(r,1);
+		if (hit(*intersection_list)!=NULL){
+			write_pixel(&m, j, i, color(black));
+		}
+    }
   }
   canvas_to_ppm(m);
 }
