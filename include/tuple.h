@@ -1,4 +1,6 @@
 #pragma once
+#define PI 3.14
+
 bool eq(float f1, float f2);
 struct Tuple {
   int dim;
@@ -37,4 +39,15 @@ void canvas_to_ppm(Matrix<Tuple> canvas);
 void write_pixel(Matrix<Tuple> *canvas, int height, int width, Tuple color);
 Matrix<float> tuple_to_matrix(Tuple t);
 Tuple matrix_to_tuple(Matrix<float> m);
+void debug(Matrix<float> m);
+float abs(Matrix<float> m);
+Matrix<float> inverse(Matrix<float> m);
+Matrix<float> create_matrix(int l, int w, float *p_v);
+Matrix<float> translate(int x, int y, int z);
+Matrix<float> scale(float x, float y, float z);
+Matrix<float> rot_x(float radians);
+Matrix<float> rot_y(float radians);
+Matrix<float> rot_z(float radians);
+Matrix<float> shear(float xy, float xz, float yx, float yz, float zx, float zy);
+
 

@@ -3,7 +3,8 @@
 #include <assert.h>
 #include <iostream>
 
-void testTupleAddition() {
+void testTupleAddition() 
+{
   float f_a[3] = {3, -2, 5}, f_b[3] = {-2, 3, 1};
   Tuple a = point(f_a), b = vector(f_b);
   Tuple d = a + b;
@@ -109,6 +110,37 @@ void testTupleCrossProduct()
 	assert(cross_p12==t12);
 	assert(cross_p21==t21);
 }
+
+void testTupletoMatrix()
+{	
+	float p_v[3]={1,2,3};
+	Tuple t=point(p_v);
+	//debug(t);
+	Matrix<float> m=tuple_to_matrix(t);
+	float p_m[4]={1,2,3,1};
+	Matrix<float> expected = create_matrix(1,4,p_m);
+	//debug(m),debug(expected);
+	assert(m==expected);	
+}
+
+void testDeterminant()
+{
+	float p_v[16]={-2,-8,3,5,-3,1,7,3,1,2,-9,6,-6,7,7,-9};
+	Matrix<float> m=create_matrix(4,4,p_v);
+	float det=abs(m),expected=-4071;
+	assert(det==expected);
+}
+
+void testInverse()
+{
+	float m_v[16]={-5,2,6,-8,1,-5,1,8,7,7,-6,-7,1,-3,7,4},
+		  inverse_v[16]={0.21805,0.45113,0.24060,-0.04511,-0.80827,
+			  -1.45677,-0.44361,0.52068,-0.07895,-0.22368,-0.05263,
+			  0.19737,-0.52256,-0.81391,-0.30075,0.30639};
+	Matrix<float> m=create_matrix(4,4,m_v),expected=create_matrix(4,4,inverse_v);
+	Matrix<float> m_inverse=inverse(m);
+	assert(m_inverse==expected);
+}
 int main()
 {
 	testTupleAddition();
@@ -121,5 +153,7 @@ int main()
 	testTupleNormalization();
 	testTupleDotProduct();
 	testTupleCrossProduct();
-		
+	testTupletoMatrix();
+	testDeterminant();
+	testInverse();	
 }

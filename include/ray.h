@@ -1,7 +1,6 @@
 #pragma once
 #include "tuple.h"
-#include <bits/stdc++.h>
-#include <iostream>
+#include <vector>
 
 struct Ray {
   Tuple origin, direction;
@@ -18,7 +17,7 @@ struct Sphere {
 };
 
 Tuple ray_position(Ray r, float t);
-std::vector<Intersection>* intersect_sphere(Ray r, int obj_id);
+std::vector<Intersection>* intersect_sphere(Ray r, Sphere s);
 Intersection* hit(std::vector<Intersection>& v);
 Ray transform(Ray r, Matrix<float> m);
 void debug(std::vector<Intersection>& v);
