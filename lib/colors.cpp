@@ -8,3 +8,9 @@ Tuple color(float *p_v)
     t.p_v[i] = p_v[i];
   return t;
 }
+
+Tuple color3(float red, float blue, float green)
+{
+	float arr[3]={red,blue,green};
+	return color(arr);
+}

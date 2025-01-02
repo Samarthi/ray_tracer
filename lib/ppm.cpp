@@ -12,7 +12,7 @@ void canvas_to_ppm(Matrix<Tuple> canvas)
   {
     for (int j = 0; j < canvas.width; ++j)
       for (int k = 0; k < canvas.p_matrix[i][j].dim; ++k)
-        std::cout << canvas.p_matrix[i][j].p_v[k] << ' ';
+        std::cout << (int)canvas.p_matrix[i][j].p_v[k] << ' ';
     std::cout << '\n';
   }
 }

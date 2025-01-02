@@ -44,8 +44,55 @@ void set_sphere_transform(Sphere *s,Matrix<float> m){
 	s->transform=m;
 }
 
+Tuple normal_at(Sphere s, Tuple p){
+	Tuple object_point = p*inverse(s.transform);
+	Tuple normal=object_point-origin();
+	//debug(inverse(s.transform));
+	Tuple transformed_normal = normal*transpose(inverse(s.transform));
+	transformed_normal.p_v[3]=0;
+	return norm(transformed_normal);
+}
+
 void debug(std::vector<Intersection>& v){
 	if(&v)
 		for(int i=0;i<v.size();i++)
 			std::cout<<"obj_id: "<<v[i].obj_id<<" t: "<<v[i].t<<std::endl;
 }
+
+Tuple reflect(Tuple in, Tuple normal){
+	return in - normal * 2 * dot(in,normal);
+}
+
+Tuple lighting(Material m, Light l, Tuple point, Tuple eye, Tuple normal){
+	Tuple effective_color = m.color * l.intensity;
+	Tuple lightv = norm(l.position - point);
+	Tuple ambient = effective_color * m.ambient;
+	float ldn = dot(lightv,normal);
+	Tuple diffuse, specular;
+	if(ldn<0){
+		diffuse = black();
+		specular = black();
+	}
+	else {
+		diffuse = effective_color * m.diffuse * ldn;
+		Tuple reflectv = reflect(-lightv, normal);
+		float reflect_dot_eye = dot(reflectv, eye);
+		if (reflect_dot_eye<=0)
+			specular = black();
+		else {
+			float factor = pow(reflect_dot_eye, m.shininess);
+			specular = l.intensity * m.specular * factor;
+		}	
+	}
+	return ambient + diffuse + specular;
+}
+
+
+
+
+
+
+
+
+
+

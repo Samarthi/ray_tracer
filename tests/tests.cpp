@@ -1,4 +1,5 @@
 #include "../include/tuple.h"
+#include "../include/ray.h"
 #include <math.h>
 #include <assert.h>
 #include <iostream>
@@ -46,7 +47,7 @@ void testTupleScalarMultiplication()
 {
 	float f_a[4] = {1,-2,3,-4}, f_b[4] = {3.5, -7, 10.5, -14};
 	Tuple t = {4,f_a};
-	Tuple y = t*3.5;
+	Tuple y = t*3.5f;
 	Tuple r = {4, f_b};
 	assert(y==r);
 }
@@ -141,6 +142,72 @@ void testInverse()
 	Matrix<float> m_inverse=inverse(m);
 	assert(m_inverse==expected);
 }
+
+void testNormal1()
+{
+	Sphere s={1,translate(0,1,0)};
+	float intersection_v[3]={0,1.70711,-0.70711},expected_v[3]={0,0.70711,-0.70711};
+	Tuple normal=normal_at(s,point(intersection_v));
+	Tuple expected=vector(expected_v);
+	//debug(normal);
+	assert(normal==expected);
+}
+
+void testNormal()
+{
+	Matrix<float> transform=rot_z(PI/5)*scale(1,0.5,1);
+	Sphere s={1,transform};
+	float intersection_v[3]={0.0,sqrt(2)/2,-sqrt(2)/2},expected_v[3]={0.0,0.97014,-0.24254};
+	Tuple normal=normal_at(s,point(intersection_v));
+	Tuple expected=vector(expected_v);
+	assert(normal==expected);	
+}
+
+void testRotz()
+{
+	float p_v[3]={0,1,0};
+	Tuple p=point(p_v);
+	Tuple half_quarter=p*rot_z(PI/4),full_quarter=p*rot_z(PI/2);
+	float expected_hq_v[3]={-sqrt(2)/2,sqrt(2)/2,0},expected_fq_v[3]={-1,0,0};
+	Tuple expected_hq=point(expected_hq_v),expected_fq=point(expected_fq_v);
+	assert(half_quarter==expected_hq);
+	assert(full_quarter==expected_fq);	
+}
+
+void testScale()
+{
+	float p_v[3]={-4,6,8},expected_v[3]={-8,18,32};
+	Tuple p=point(p_v),expected=point(expected_v);
+	Tuple scaled=p*scale(2,3,4);
+	assert(scaled==expected);	
+}
+
+void testLighting()
+{
+	//eye between light and surface
+	Tuple position=point3(0,0,0), eyev=vec3(0,0,-1), normalv=vec3(0,0,-1);
+	Light light = {point3(0,0,-10),color3(1,1,1)};
+	Material m;
+	Tuple result = lighting(m,light,position,eyev,normalv);
+	assert(result==color3(1.9,1.9,1.9)); 
+	
+	//eye between light and surface, eye offset at 45deg
+	eyev=vec3(0,sqrt(2)/2,-sqrt(2)/2);
+	result = lighting(m, light, position, eyev,normalv);
+	assert(result==color3(1.0,1.0,1.0));
+	
+	//lighting with eye opposite surface
+	eyev = vec3(0,0,-1);
+	light.position=point3(0,10,-10);
+	result = lighting(m, light, position, eyev,normalv);
+	assert(result==color3(0.7364,0.7364,0.7364));	
+	
+	//eye in the path of the reflection vector
+	eyev=vec3(0,-sqrt(2)/2,-sqrt(2)/2);
+	result = lighting(m, light, position, eyev,normalv);
+	assert(result==color3(1.6364,1.6364,1.6364));	
+}
+
 int main()
 {
 	testTupleAddition();
@@ -155,5 +222,9 @@ int main()
 	testTupleCrossProduct();
 	testTupletoMatrix();
 	testDeterminant();
-	testInverse();	
+	testInverse();
+	testNormal();
+	testNormal1();
+	testRotz();
+	testLighting();	
 }

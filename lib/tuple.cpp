@@ -4,7 +4,10 @@
 #include <math.h>
 #include <stdexcept>
 #include <assert.h>
-
+#include <functional>
+#include <vector>
+#include <tuple>
+#include <stack>
 #define EPS 0.001
 
 bool eq(float f1, float f2) { return fabs(f1 - f2) <= EPS; }
@@ -49,6 +52,25 @@ Tuple Tuple::operator/(float scalar) {
   for (int i = 0; i < this->dim; ++i)
     r.p_v[i] = this->p_v[i] /= scalar;
   return r;
+}
+
+Tuple Tuple::operator *(Matrix<float> m) {
+	Tuple t = {this->dim,new float[this->dim]()};
+	for(int i=0;i<this->dim;i++){
+		t.p_v[i]=0;
+		for(int j=0;j<this->dim;j++)
+				t.p_v[i]+= this->p_v[j] * m.p_matrix[j][i];
+	}
+	return t;
+}
+
+//only for colors
+Tuple Tuple::operator *(Tuple t) {
+	Tuple result = {3, (float*)calloc(sizeof(float),3)};
+	for(int i=0;i<t.dim;i++){
+		result.p_v[i] = this->p_v[i]*t.p_v[i];	
+	}
+	return result;
 }
 
 void debug(Tuple t) {
@@ -103,9 +125,24 @@ Tuple vector(float *p_v) {
   t.p_v[3] = 0;
   return t;
 }
+
 Tuple origin() {
   float p_origin[3] = {0, 0, 0};
   return point(p_origin);
+}
+
+Tuple black() {
+	float p_black[3] = {0, 0, 0};
+	return color(p_black);
+}
+Tuple point3(float x, float y, float z) {
+	float arr[3]={x,y,z};
+	return point(arr);
+}
+
+Tuple vec3(float x, float y, float z) {
+	float arr[3]={x,y,z};
+	return vector(arr);
 }
 
 template <typename T> bool Matrix<T>::operator==(Matrix<T> m) {
@@ -312,18 +349,23 @@ Matrix<float> rot_y(float radians) {
 
 Matrix<float> rot_z(float radians) {
   Matrix<float> rot_z_tr = identity(4);
-  rot_z_tr.p_matrix[0][0] = rot_z_tr.p_matrix[1][1] = cos(radians);
-  rot_z_tr.p_matrix[1][0] = sin(radians);
-  rot_z_tr.p_matrix[0][1] = -1 * sin(radians);
+  rot_z_tr.p_matrix[0][0] = cos(radians), rot_z_tr.p_matrix[1][1] = cos(radians),
+  rot_z_tr.p_matrix[1][0] = -1 * sin(radians),  rot_z_tr.p_matrix[0][1] = sin(radians);
   return rot_z_tr;
 }
 
 Matrix<float> shear(float xy, float xz, float yx, float yz, float zx, float zy) {
   Matrix<float> shear_tr = identity(4);
-  shear_tr.p_matrix[1][0] = yx, shear_tr.p_matrix[0][2] = zx,
-  shear_tr.p_matrix[0][1] = xy, shear_tr.p_matrix[1][2] = zy,
-  shear_tr.p_matrix[0][2] = xz, shear_tr.p_matrix[2][1] = yz;
+  shear_tr.p_matrix[0][1] = yx, shear_tr.p_matrix[0][2] = zx,
+  shear_tr.p_matrix[1][0] = xy, shear_tr.p_matrix[1][2] = zy,
+  shear_tr.p_matrix[2][0] = xz, shear_tr.p_matrix[2][1] = yz;
   return shear_tr;
+}
+void executeFunctions(const std::vector<std::pair<std::function<void()>, std::function<void()>>>& functions) {
+    for (const auto& func_pair : functions) {
+        func_pair.first();
+        func_pair.second();
+    }
 }
 
 void debug(Matrix<float> m){
@@ -342,4 +384,8 @@ Matrix<float> create_matrix(int l, int w, float* p_v){
 		for (int j = 0; j < w; j++)
 			m.p_matrix[i][j] = p_v[i*w+j];
 	return m;
+}
+
+Matrix<float> final_transform(Matrix<float> t1,Matrix<float> t2){
+	return t2*t1;
 }
