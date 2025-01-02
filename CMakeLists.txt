@@ -14,5 +14,5 @@ add_executable(
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 target_link_libraries(main PRIVATE lib)
-target_include_directories(tests PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_include_directories(main PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
