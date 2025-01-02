@@ -2,6 +2,7 @@
 #include "../include/tuple.h"
 #include <iostream>
 #include <math.h>
+#include <algorithm>
 #include <climits>
 
 Tuple ray_position(Ray r, float time) { return r.origin + r.direction * time; }
@@ -13,16 +14,22 @@ Ray transform(Ray r,Matrix<float> m){
 	return transformed_ray;	
 }
 
-std::vector<Intersection>* intersect_sphere(Ray r, Sphere s) {
+std::vector<Intersection>* intersect_sphere(Ray r, Sphere s, std::vector<Intersection> *p_intersection_list) {
 	Ray transformed_ray=transform(r,inverse(s.transform));
 	Tuple sphere_to_ray = transformed_ray.origin - origin();
 	float a = dot(transformed_ray.direction, transformed_ray.direction), b = 2 * dot(transformed_ray.direction, sphere_to_ray),
         c = dot(sphere_to_ray, sphere_to_ray) - 1;
     float d = (b * b) - (4 * a * c);
-    if (d < 0)
-		return NULL;
-	std::vector<Intersection> *intersections = new std::vector<Intersection>{{s.obj_id, (-b + sqrt(d))/(2*a)}, {s.obj_id, (-b - sqrt(d))/(2*a)}};
-	return intersections;
+    if (d >= 0){
+		if(!p_intersection_list)
+			p_intersection_list = new std::vector<Intersection>{{s.obj_id, (-b + sqrt(d))/(2*a)}, {s.obj_id, (-b - sqrt(d))/(2*a)}};		
+		else {
+			Intersection i = {s.obj_id, (-b + sqrt(d))/(2*a)},
+			j= {s.obj_id, (-b - sqrt(d))/(2*a)};
+			(*p_intersection_list).push_back(i);(*p_intersection_list).push_back(j);
+		}
+	}
+	return p_intersection_list;
 }
 
 Intersection* hit(std::vector<Intersection>& v) {
@@ -87,8 +94,24 @@ Tuple lighting(Material m, Light l, Tuple point, Tuple eye, Tuple normal){
 	return ambient + diffuse + specular;
 }
 
+World world() {
+	Light light={point3(-10,10,-10),color3(1,1,1)};
+	Material m = {color3(0.8,1.0,0.6),0.7,0.2};
+	Sphere s1={1,identity(4),m};
+	Sphere s2={2,scale(0.5,0.5,0.5)};
+	World w={{light},{s1,s2}};
+	return w;	
+}
 
-
+std::vector<Intersection>* intersect_world(Ray r, World w) {
+	std::vector<Intersection>* p_intersection_list = new std::vector<Intersection>();
+	for(auto i=w.sphere_list.begin();i<w.sphere_list.end();++i){
+		p_intersection_list=intersect_sphere(r,*i,p_intersection_list);
+	}
+	std::sort((*p_intersection_list).begin(),(*p_intersection_list).end(),
+		[](const Intersection &a, const Intersection &b){return a.t<b.t;});
+	return p_intersection_list;
+}
 
 
 

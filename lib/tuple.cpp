@@ -8,6 +8,7 @@
 #include <vector>
 #include <tuple>
 #include <stack>
+#include <algorithm>
 #define EPS 0.001
 
 bool eq(float f1, float f2) { return fabs(f1 - f2) <= EPS; }
@@ -388,4 +389,45 @@ Matrix<float> create_matrix(int l, int w, float* p_v){
 
 Matrix<float> final_transform(Matrix<float> t1,Matrix<float> t2){
 	return t2*t1;
+}
+
+Tuple color(float *p_v)
+{
+  Tuple t = {3, (float *)malloc(sizeof(float) * 3)};
+  for (int i = 0; i < 3; ++i)
+    t.p_v[i] = p_v[i];
+  return t;
+}
+
+Tuple color3(float red, float blue, float green)
+{
+	float arr[3]={red,blue,green};
+	return color(arr);
+}
+
+Matrix<Tuple> canvas(int length, int width)
+{
+  float white[3] = {255, 255, 255};
+  Matrix<Tuple> m = {length, width, (Tuple **)malloc(sizeof(Tuple *) * length)};
+  for (int i = 0; i < length; ++i)
+  {
+    m.p_matrix[i] = (Tuple *)malloc(sizeof(Tuple) * width);
+    std::fill(m.p_matrix[i], m.p_matrix[i] + width, color(white));
+  }
+  return m;
+}
+
+bool is_within_canvas_bounds(Matrix<Tuple> *canvas, int height, int width)
+{
+  if (height < 0 or height > canvas->length)
+    return false;
+  if (width < 0 or width > canvas->width)
+    return false;
+  return true;
+}
+
+void write_pixel(Matrix<Tuple> *canvas, int height, int width, Tuple color)
+{
+  if (is_within_canvas_bounds(canvas, height, width))
+    canvas->p_matrix[height][width] = color;
 }
