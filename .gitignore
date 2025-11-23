@@ -34,3 +34,6 @@
 *.ppm
 build/*
 *.plan
+
+*.cmake
+*.txt
