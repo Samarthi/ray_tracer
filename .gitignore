@@ -38,3 +38,4 @@ build/*
 *.cmake
 *.txt
 CMakeFiles/
+MakeFile
