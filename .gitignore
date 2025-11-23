@@ -37,3 +37,4 @@ build/*
 
 *.cmake
 *.txt
+CMakeFiles/
