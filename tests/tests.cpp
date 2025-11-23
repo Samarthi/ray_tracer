@@ -208,6 +208,12 @@ void testLighting()
 	assert(result==color3(1.6364,1.6364,1.6364));	
 }
 
+void testIntersectWorld() {
+	World w=world();
+	Ray r = { point3(0,0,-5),vec3(0,0,1)};
+	std::vector<Intersection> * p_il=intersect_world(r,w);
+	assert((*p_il).size()==4);
+}
 int main()
 {
 	testTupleAddition();
@@ -226,5 +232,6 @@ int main()
 	testNormal();
 	testNormal1();
 	testRotz();
-	testLighting();	
+	testLighting();
+	testIntersectWorld();	
 }
