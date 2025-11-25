@@ -17,20 +17,20 @@ int main() {
   for (int i = 0; i < canvas_size; ++i) {
     float world_y = half - pixel_size * i;
     for(int j = 0; j < canvas_size; ++j){
-		float world_x = -half + pixel_size * j;
-		float f_position[3] = {world_x, world_y, wall_z};
-		Tuple t_position = point(f_position);
-		Tuple direction = norm(t_position - r_origin);
-		Ray r= {r_origin, norm( t_position - r_origin )};
-		std::vector<Intersection>* intersection_list = intersect_sphere(r,s);
-		Intersection* hit_p = hit(*intersection_list);
-		if (hit_p!=NULL){
-			Tuple p = ray_position(r,hit_p->t);
-			Tuple normal = normal_at(s,p);
-			Tuple eye = r.direction*-1; 
-			Tuple pixel_color = lighting(s.material, light, p, eye, normal);
-			write_pixel(&m, j, i, pixel_color);
-		}
+			float world_x = -half + pixel_size * j;
+			float f_position[3] = {world_x, world_y, wall_z};
+			Tuple t_position = point(f_position);
+			Tuple direction = norm(t_position - r_origin);
+			Ray r= {r_origin, norm( t_position - r_origin )};
+			std::vector<Intersection>* intersection_list = intersect_sphere(r,s);
+			Intersection* hit_p = hit(*intersection_list);
+			if (hit_p!=NULL){
+				Tuple p = ray_position(r,hit_p->t);
+				Tuple normal = normal_at(s,p);
+				Tuple eye = r.direction*-1; 
+				Tuple pixel_color = lighting(s.material, light, p, eye, normal);
+				write_pixel(&m, j, i, pixel_color);
+			}
     }
   }
   canvas_to_ppm(m);

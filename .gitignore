@@ -38,5 +38,5 @@ build/*
 *.cmake
 *.txt
 CMakeFiles/
-MakeFile
-_deps/
+Makefile
+_deps/ 	

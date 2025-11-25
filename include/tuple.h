@@ -12,6 +12,7 @@ template <typename T> struct Matrix {
   Matrix<T> operator*(Matrix<T> m);
   Matrix<T> operator-();
 };
+\
 
 struct Tuple {
   int dim;
