@@ -45,3 +45,21 @@ TEST(HelloTest, Vec3_Magnitude){
   EXPECT_EQ(abs(d),exp_d);
 
 }
+
+TEST(HelloTest, Vec3_Normalisation){
+  Vec3 a = {4,0,0}, exp_a = {1, 0, 0}, b = {1,2,3}, exp_b = {0.267261, 0.5342, 0.80178};
+  EXPECT_EQ(norm(a), exp_a);
+  EXPECT_EQ(norm(b), exp_b);
+}
+
+TEST(HelloTest, Vec3Dot){
+  Vec3 a = {1,2,3}, b = {2,3,4};
+  float expected = 20;
+  EXPECT_EQ(dot(a,b),expected);
+}
+
+TEST(HelloTest, Vec3_Cross){
+  Vec3 a = {1,2,3}, b = {2,3,4}, expected = {-1, 2, -1};
+  EXPECT_EQ(cross(a,b), expected);
+  EXPECT_EQ(cross(b,a), -expected);
+}

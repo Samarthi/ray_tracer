@@ -118,7 +118,14 @@ inline float abs(const Vec3 &v){
 	return sqrt(result);
 }
 
-inline Vec3 norm(const Vec3 &v);
+inline Vec3 norm(const Vec3 &v){
+	float v_abs =abs(v);
+	Vec3 result;
+	for(int i=0;i<3;++i)
+		result.elements[i] = v.elements[i]/v_abs;
+	return result;
+}
+
 inline Vec3 point(float x, float y, float z);
 inline Vec3 vector(float x, float y, float z);
 inline Vec3 reflect(const Vec3 &incident, const Vec3 &normal);
