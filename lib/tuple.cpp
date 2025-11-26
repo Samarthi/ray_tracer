@@ -419,9 +419,9 @@ Matrix<Tuple> canvas(int length, int width)
 
 bool is_within_canvas_bounds(Matrix<Tuple> *canvas, int height, int width)
 {
-  if (height < 0 or height > canvas->length)
+  if (height < 0 || height > canvas->length)
     return false;
-  if (width < 0 or width > canvas->width)
+  if (width < 0 || width > canvas->width)
     return false;
   return true;
 }
