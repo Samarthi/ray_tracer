@@ -126,33 +126,97 @@ inline Vec3 norm(const Vec3 &v){
 	return result;
 }
 
-inline Vec3 point(float x, float y, float z);
-inline Vec3 vector(float x, float y, float z);
-inline Vec3 reflect(const Vec3 &incident, const Vec3 &normal);
-
-
 union Vec4{
 	struct{
-		float x,y,z,w;
+		Vec3 v;
+		float w;
 	};
-
 	float elements[4];
+
+	inline bool operator==(const Vec4 &vec) const{
+		return this->v==vec.v && this->w == vec.w;
+	}
+
+	inline Vec4 operator+(const Vec3 &vec) const{
+		Vec4 result = {this->v+vec.v, this->w+vec.w};
+		return result;
+	}
+
+	inline Vec4& operator+=(const Vec3 &v){
+		this->v+=vec.v;
+		this->w+=vec.w;
+		return *this;
+	}
+
+	inline Vec4 operator-(const Vec3 &v) const{
+		Vec4 result = {this->v-vec.v, this->w-vec.w};
+		return result;
+	}
+
+	inline Vec4& operator-=(const Vec3 &v){
+		this->v+=vec.v;
+		this->w+=vec.w;
+		return *this;
+	}
+
+	inline Vec4 operator-() const{
+		Vec4 result = {-this->v,-this->w};
+		return result;
+	}
+
+	inline Vec4 operator*(float scalar) const{
+		Vec4 result={this->v*scalar, 1};
+		return result;
+	}
+
+	inline Vec3& operator*=(float scalar){
+		for (int i = 0; i < 3; ++i)
+			this->elements[i] *= scalar;
+		return *this;
+	}
+
+	inline Vec3 operator/(float scalar) const{
+		Vec3 result;
+		for (int i = 0; i < 3; ++i)
+			result.elements[i] = this->elements[i] / scalar;
+		return result;
+	}
+
+	inline Vec3& operator/=(float scalar){
+		for (int i = 0; i < 3; ++i)
+			this->elements[i] /= scalar;
+		return *this;
+	}
+
 };
 
-struct Mat4{
-	Vec4 elements[4];
+struct Mat4;
+inline Mat4 identity();
 
+struct Mat4{
+	Vec4 vectors[4]; //columns
 	bool operator== (Mat4 &m);
 	inline Mat4 operator+ (const Mat4 &m)const;
 	inline Mat4 operator- (const Mat4 &m)const;
 	inline Mat4 operator* (const Mat4 &m)const;
-	inline Mat4 operator- ()const;
+	inline Mat4 operator- ()const{
+		//LU decomposition
+		Mat4 L = identity(), U=identity();
+		for(int i=0;i<3;++i){
+			L[i+1] = 
+		}
+
+	}
 	inline Mat4& operator+= (const Mat4 &m);
 	inline Mat4& operator-= (const Mat4 &m);
 	inline Mat4& operator*= (const Mat4 &m);	
 };
 
 
-inline Mat4 identity();
+inline Mat4 identity(){
+	Mat4 m =  {{{1,0,0},0},{{0,1,0},0},{{0,0,1},0},{{0,0,0},1}};
+	return m;
+}
+
 inline Mat4 transpose(Mat4 &m);
 inline float abs(Mat4 &m);
