@@ -129,7 +129,7 @@ inline Vec3 norm(const Vec3 &v){
 union Vec4{
 	struct{
 		Vec3 v;
-		float w;
+		int w;
 	};
 	float elements[4];
 
@@ -137,25 +137,25 @@ union Vec4{
 		return this->v==vec.v && this->w == vec.w;
 	}
 
-	inline Vec4 operator+(const Vec3 &vec) const{
+	inline Vec4 operator+(const Vec4 &vec) const{
 		Vec4 result = {this->v+vec.v, this->w+vec.w};
 		return result;
 	}
 
-	inline Vec4& operator+=(const Vec3 &v){
+	inline Vec4& operator+=(const Vec4 &vec){
 		this->v+=vec.v;
-		this->w+=vec.w;
+		this->w&=vec.w;
 		return *this;
 	}
 
-	inline Vec4 operator-(const Vec3 &v) const{
+	inline Vec4 operator-(const Vec4 &vec) const{
 		Vec4 result = {this->v-vec.v, this->w-vec.w};
 		return result;
 	}
 
-	inline Vec4& operator-=(const Vec3 &v){
+	inline Vec4& operator-=(const Vec4 &vec){
 		this->v+=vec.v;
-		this->w+=vec.w;
+		this->w&=vec.w;
 		return *this;
 	}
 
@@ -165,36 +165,36 @@ union Vec4{
 	}
 
 	inline Vec4 operator*(float scalar) const{
-		Vec4 result={this->v*scalar, 1};
+		Vec4 result={this->v*scalar, this->w};
 		return result;
 	}
 
-	inline Vec3& operator*=(float scalar){
-		for (int i = 0; i < 3; ++i)
-			this->elements[i] *= scalar;
+	inline Vec4& operator*=(float scalar){
+		this->v*=scalar;
 		return *this;
 	}
 
-	inline Vec3 operator/(float scalar) const{
-		Vec3 result;
-		for (int i = 0; i < 3; ++i)
-			result.elements[i] = this->elements[i] / scalar;
+	inline Vec4 operator/(float scalar) const{
+		Vec4 result = {this->v/scalar,this->w};
 		return result;
 	}
 
-	inline Vec3& operator/=(float scalar){
-		for (int i = 0; i < 3; ++i)
-			this->elements[i] /= scalar;
+	inline Vec4& operator/=(float scalar){
+		this->v/=scalar;
 		return *this;
 	}
 
 };
 
-struct Mat4;
+union Mat4;
 inline Mat4 identity();
 
-struct Mat4{
-	Vec4 vectors[4]; //columns
+union Mat4{
+	struct{
+		Vec4 vectors[4]; //columns
+	};
+	float elements[16];
+	
 	bool operator== (Mat4 &m);
 	inline Mat4 operator+ (const Mat4 &m)const;
 	inline Mat4 operator- (const Mat4 &m)const;
@@ -202,9 +202,7 @@ struct Mat4{
 	inline Mat4 operator- ()const{
 		//LU decomposition
 		Mat4 L = identity(), U=identity();
-		for(int i=0;i<3;++i){
-			L[i+1] = 
-		}
+		return identity();
 
 	}
 	inline Mat4& operator+= (const Mat4 &m);
@@ -214,7 +212,7 @@ struct Mat4{
 
 
 inline Mat4 identity(){
-	Mat4 m =  {{{1,0,0},0},{{0,1,0},0},{{0,0,1},0},{{0,0,0},1}};
+	Mat4 m =  {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
 	return m;
 }
 
