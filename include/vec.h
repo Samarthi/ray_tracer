@@ -129,7 +129,7 @@ inline Vec3 norm(const Vec3 &v){
 union Vec4{
 	struct{
 		Vec3 v;
-		int w;
+		float w;
 	};
 	float elements[4];
 
@@ -144,7 +144,7 @@ union Vec4{
 
 	inline Vec4& operator+=(const Vec4 &vec){
 		this->v+=vec.v;
-		this->w&=vec.w;
+		this->w+=vec.w;
 		return *this;
 	}
 
@@ -154,8 +154,8 @@ union Vec4{
 	}
 
 	inline Vec4& operator-=(const Vec4 &vec){
-		this->v+=vec.v;
-		this->w&=vec.w;
+		this->v-=vec.v;
+		this->w-=vec.w;
 		return *this;
 	}
 
@@ -185,6 +185,36 @@ union Vec4{
 	}
 
 };
+
+inline Vec4 cross(const Vec4 &v1, const Vec4 &v2){
+	Vec4 result = {cross(v1.v,v2.v),v1.w*v2.w};
+	return result;
+}
+
+inline float dot(const Vec4 &v1, const Vec4 &v2) {
+	return dot(v1.v,v2.v);
+}
+
+inline Vec4 hadamard(const Vec4 &v1, const Vec4 &v2){
+	Vec4 result = {hadamard(v1.v,v2.v),v1.w*v2.w};
+	return result;
+}
+
+inline void debug(const Vec4 &v) {
+	for (int i = 0; i < 4; ++i)
+		std::cout << i << ' ' << v.elements[i] << ' ';
+	std::cout << std::endl;
+}
+
+inline float abs(const Vec4 &v){
+	return abs(v.v);
+}
+
+inline Vec4 norm(const Vec4 &v){
+	float v_abs =abs(v);
+	Vec4 result = {norm(v.v),v.w};
+	return result;
+}
 
 union Mat4;
 inline Mat4 identity();
