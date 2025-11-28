@@ -37,6 +37,8 @@ build/*
 
 *.cmake
 *.txt
-CMakeFiles/
+CMakeFiles/*
 Makefile
-_deps/ 	
+_deps/*
+Debug/*
+hello_test.dir/*	
