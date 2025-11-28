@@ -10,6 +10,8 @@ union Vec3 {
 	
 	float elements[3];
 	
+	//TODO: overload the [] operator 
+	
 	inline bool operator==(const Vec3 &v) const{
 		for (int i = 0; i < 3; ++i){
 			float abs_val = this->elements[i] - v.elements[i];
@@ -133,6 +135,8 @@ union Vec4{
 	};
 	float elements[4];
 
+	//TODO: overload the [] operator 
+
 	inline bool operator==(const Vec4 &vec) const{
 		return this->v==vec.v && this->w == vec.w;
 	}
@@ -216,6 +220,7 @@ inline Vec4 norm(const Vec4 &v){
 	return result;
 }
 
+
 union Mat4;
 inline Mat4 identity();
 
@@ -225,6 +230,8 @@ union Mat4{
 	};
 	float elements[16];
 	
+	//TODO: overload the [] operator 
+
 	bool operator== (Mat4 &m);
 	inline Mat4 operator+ (const Mat4 &m)const;
 	inline Mat4 operator- (const Mat4 &m)const;
@@ -232,6 +239,23 @@ union Mat4{
 	inline Mat4 operator- ()const{
 		//LU decomposition
 		Mat4 L = identity(), U=identity();
+		for(int i=0;i<4;++i){
+			for (int j = i; j < 4; ++j){
+				float subtract = 0.0;
+				for (int k = 0; k < i; ++k)
+					subtract+= L.vectors[i].elements[k] * U.vectors[k].elements[j]; 
+				U.vectors[i].elements[j] = this->vectors[i].elements[j] - subtract;
+			}
+			for (int j = i+1; j < N; ++j){
+				subtract = 0.0;
+				for (int k = 0; k < i; ++k)
+					subtract+=L.vectors[j].elements[k] * U.vectors[k].elements[i];
+				L.vectors[j].elements[i] = (this->vectors[j].elements[i] - subtract)/U.vectors[i].elements[i];
+			}
+		}
+		
+		//TODO: substitution
+
 		return identity();
 
 	}
