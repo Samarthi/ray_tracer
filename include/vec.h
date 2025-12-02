@@ -1,5 +1,5 @@
 #pragma once
-#define EQ 0.0008
+#define EQ 0.0001
 #include <cmath>
 #include <iostream>
 
@@ -118,7 +118,7 @@ inline Vec3 hadamard(const Vec3 &v1, const Vec3 &v2){
 
 inline void debug(const Vec3 &v) {
 	for (int i = 0; i < 3; ++i)
-		std::cout << i << ' ' << v[i] << ' ';
+		std::cout << v[i] << ' ';
 	std::cout << std::endl;
 }
 
@@ -307,7 +307,6 @@ inline Mat4 identity(){
 	return m;
 }
 
-	
 inline Mat4 inverse(const Mat4 &m) {
 	//LU decomposition
 	Mat4 L = identity(), U=identity();
@@ -351,6 +350,15 @@ inline Mat4 inverse(const Mat4 &m) {
 	return X;
 }
 
+inline Mat4 transpose(const Mat4 &m){
+	Mat4 result;
+	for(int i=0;i<4;++i)
+		for(int j=0;j<4;++j)
+			if (i==j)
+				result[i][j]=m[i][j];
+			else result[i][j] = m[j][i];
+	return result; 
+}
 
-inline Mat4 transpose(Mat4 &m);
+//determinant
 inline float abs(Mat4 &m);

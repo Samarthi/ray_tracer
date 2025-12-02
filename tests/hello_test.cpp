@@ -47,7 +47,9 @@ TEST(HelloTest, Vec3_Magnitude){
 }
 
 TEST(HelloTest, Vec3_Normalisation){
-  Vec3 a = {4,0,0}, exp_a = {1, 0, 0}, b = {1,2,3}, exp_b = {0.267261, 0.5342, 0.80178};
+  Vec3 a = {4,0,0}, exp_a = {1, 0, 0}, b = {1,2,3}, exp_b = {0.2672, 0.5345, 0.8017};
+  debug(norm(a));
+  debug(norm(b));
   EXPECT_EQ(norm(a), exp_a);
   EXPECT_EQ(norm(b), exp_b);
 }
@@ -109,7 +111,7 @@ TEST(HelloTest, Vec4_Magnitude){
 }
 
 TEST(HelloTest, Vec4_Normalisation){
-  Vec4 a = {4,0,0, 0}, exp_a = {1, 0, 0, 0}, b = {1,2,3, 0}, exp_b = {0.267261, 0.5342, 0.80178,0};
+  Vec4 a = {4,0,0, 0}, exp_a = {1, 0, 0, 0}, b = {1,2,3, 0}, exp_b = {0.2672, 0.5345, 0.8017,0.000};
   EXPECT_EQ(norm(a), exp_a);
   EXPECT_EQ(norm(b), exp_b);
 }
