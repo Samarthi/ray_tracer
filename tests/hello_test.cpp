@@ -125,3 +125,22 @@ TEST(HelloTest, Vec4_Cross){
   EXPECT_EQ(cross(a,b), expected);
   EXPECT_EQ(cross(b,a), -expected);
 }
+
+TEST(HelloTest, Mat4_Inverse){
+  Mat4 m = {-5,2,6,-8,1,-5,1,8,7,7,-6,-7,1,-3,7,4},
+  expected = {0.21805,0.45113,0.24060,-0.04511,-0.80827,
+			  -1.45677,-0.44361,0.52068,-0.07895,-0.22368,-0.05263,
+			  0.19737,-0.52256,-0.81391,-0.30075,0.30639};
+  Mat4 result = inverse(m);
+  for(int i=0;i<4;++i){
+    for(int j=0;j<4;++j)
+      std::cout<<expected[i][j]<<' ';
+  }
+  std::cout<<std::endl;
+  for(int i=0;i<4;++i){
+    for (int j = 0; j < 4; ++j)
+      std::cout<<result[i][j]<<' ';
+  }
+  std::cout<<std::endl;
+  EXPECT_EQ(result,expected);
+}

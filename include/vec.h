@@ -1,7 +1,13 @@
 #pragma once
-#define EQ 0.0008
+#define EQ 0.008
 #include <cmath>
 #include <iostream>
+
+inline bool float_eq(float f1, float f2){
+	float abs_val = f1 - f2;
+	abs_val = abs_val > 0 ? abs_val : -1 * abs_val;
+	return abs_val < EQ;
+}
 
 union Vec3 {
 	struct{
@@ -20,14 +26,11 @@ union Vec3 {
 	
 	inline bool operator==(const Vec3 &v) const{
 		for (int i = 0; i < 3; ++i){
-			float abs_val = (*this)[i] - v[i];
-			abs_val = abs_val > 0 ? abs_val : -1 * abs_val;
-			if (abs_val > EQ)
+			if (!float_eq((*this)[i], v[i]))
 				return false;
 		}
 		return true;
 	}
-
 
 	inline Vec3 operator+(const Vec3 &v) const{
 		Vec3 result;
@@ -151,7 +154,7 @@ union Vec4{
 	
 
 	inline bool operator==(const Vec4 &vec) const{
-		return this->v==vec.v && this->w == vec.w;
+		return this->v==vec.v && float_eq(this->w, vec.w);
 	}
 
 	inline Vec4 operator+(const Vec4 &vec) const{
@@ -251,10 +254,9 @@ union Mat4{
 		return this->vectors[idx];
 	}
 
-	bool operator== (Mat4 &m)const {
+	inline bool operator== (const Mat4 &m)const {
 		for(int i=0;i<4;++i){
-			for(int j=0;j<4;++j)
-				if(not ((*this)[i][j]==m[i][j])) return false;	
+			if(!(m[i]==(*this)[i])) return false;	
 		}
 		return true;
 	}
@@ -285,50 +287,6 @@ union Mat4{
 			}
 		return result;
 	}
-	
-	inline Mat4 operator- ()const{
-		//LU decomposition
-		Mat4 L = identity(), U=identity();
-		for(int i=0;i<4;++i){
-			for (int j = i; j < 4; ++j){
-				float subtract = 0.0;
-				for (int k = 0; k < i; ++k)
-					subtract+= L[i][k] * U[k][j]; 
-				U[i][j] = (*this)[i][j] - subtract;
-			}
-			for (int j = i+1; j < 4; ++j){
-				float subtract = 0.0;
-				for (int k = 0; k < i; ++k)
-					subtract+=L[j][k] * U[k][i];
-				L[j][i] = ((*this)[j][i] - subtract)/U[i][i];
-			}
-		}		
-
-		//Y = L^-1, X = A^-1
-		
-		Mat4 X = identity(), Y = identity();
-		 
-		for(int i=0;i<4;++i){
-			for(int j=0;j<i;++j){
-				float subtract = 0.0;
-				for(int k=j;k<i;++k)
-					subtract+=Y[k][j]*L[i][k];
-				
-				Y[i][j] = -subtract;
-			}
-		}
-	
-		for(int i=3;i>=0;--i){
-			for(int j=0;j<4;++j){
-				float subtract = 0.0;
-				for(int k=i+1;k<4;++k)
-					subtract += U[i][k]*X[k][j];
-				X[i][j] = (Y[i][j] - subtract)/U[i][i];
-			}
-		}
-		return X;
-	}
-
 	inline Mat4& operator+= (const Mat4 &m){
 		for(int i=0;i<4;++i)
 			for(int j=0;j<4;++j)
@@ -348,6 +306,51 @@ inline Mat4 identity(){
 	Mat4 m =  {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
 	return m;
 }
+
+	
+inline Mat4 inverse(const Mat4 &m) {
+	//LU decomposition
+	Mat4 L = identity(), U=identity();
+	for(int i=0;i<4;++i){
+		for (int j = i; j < 4; ++j){
+			float subtract = 0.0;
+			for (int k = 0; k < i; ++k)
+				subtract+= L[i][k] * U[k][j]; 
+			U[i][j] = m[i][j] - subtract;
+		}
+		for (int j = i+1; j < 4; ++j){
+			float subtract = 0.0;
+			for (int k = 0; k < i; ++k)
+				subtract+=L[j][k] * U[k][i];
+			L[j][i] = (m[j][i] - subtract)/U[i][i];
+		}
+	}		
+
+	//Y = L^-1, X = A^-1
+	
+	Mat4 X = identity(), Y = identity();
+		
+	for(int i=0;i<4;++i){
+		for(int j=0;j<i;++j){
+			float subtract = 0.0;
+			for(int k=j;k<i;++k)
+				subtract+=Y[k][j]*L[i][k];
+			
+			Y[i][j] = -subtract;
+		}
+	}
+
+	for(int i=3;i>=0;--i){
+		for(int j=0;j<4;++j){
+			float subtract = 0.0;
+			for(int k=i+1;k<4;++k)
+				subtract += U[i][k]*X[k][j];
+			X[i][j] = (Y[i][j] - subtract)/U[i][i];
+		}
+	}
+	return X;
+}
+
 
 inline Mat4 transpose(Mat4 &m);
 inline float abs(Mat4 &m);
