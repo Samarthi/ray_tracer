@@ -1,5 +1,5 @@
 #pragma once
-#define EQ 0.008
+#define EQ 0.0008
 #include <cmath>
 #include <iostream>
 
