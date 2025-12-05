@@ -59,4 +59,17 @@ Mat4 rot_z(float theta){
 }
 
 
-Mat4 look_at(const Vec4 &eye, const Vec4 &center, const Vec4 &up)
+Mat4 look_at(const Vec4 &eye, const Vec4 &center, const Vec4 &up){
+	//vector to column
+	Vec4 arr[3];
+	Vec4 arr[0] = center - eye; //forward
+	Vec4 arr[1] = cross(arr[0], up) ; //= right;
+	Vec4 arr[2]=up; //up 
+
+	Mat4 result;
+	for(int i=0;i=3;i++){
+		for(int j=0;j<4;++j)
+			result[j][i] = arr[i][j];
+	}
+	return result;
+}
