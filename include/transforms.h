@@ -1,4 +1,4 @@
-#include "Vec.h"
+#include "vec.h"
 #include <cmath>
 
 inline Vec4 point(float x, float y, float z){
@@ -27,8 +27,7 @@ inline Mat4 scale(float sx, float sy, float sz){
 	return result;
 }
 
-
-Mat4 rot_x(float theta){
+inline Mat4 rot_x(float theta){
 	Mat4 result = identity();
 	float cosine = cos(theta), sine = sin(theta);
 	result[1][1] = cosine;
@@ -38,7 +37,7 @@ Mat4 rot_x(float theta){
 	return result;
 }
 
-Mat4 rot_y(float theta){
+inline Mat4 rot_y(float theta){
 	Mat4 result = identity();
 	float cosine = cos(theta), sine = sin(theta);
 	result[0][0] = cosine;
@@ -48,7 +47,7 @@ Mat4 rot_y(float theta){
 	return result;
 }
 
-Mat4 rot_z(float theta){
+inline Mat4 rot_z(float theta){
 	Mat4 result = identity();
 	float cosine = cos(theta), sine = sin(theta);
 	result[0][0] = cosine;
@@ -58,18 +57,26 @@ Mat4 rot_z(float theta){
 	return result;
 }
 
+inline Mat4 ortho_projection(float L, float R, float T, float B, float N, float F){
+	Mat4 result = identity();
+	// camera points down negative z
+	//            scale factors            translational factors
+	result[0][0] = 2/(R-L), result[0][3] = -(R+L)/(R-L);
+	result[1][1] = 2/(T-B), result[1][3] = -(T+B)/(T-B);
+	result[2][2] = 2/(N-F), result[2][3] = -(N+F)/(N-F);
 
-Mat4 look_at(const Vec4 &eye, const Vec4 &center, const Vec4 &up){
-	//vector to column
-	Vec4 arr[3];
-	Vec4 arr[0] = center - eye; //forward
-	Vec4 arr[1] = cross(arr[0], up) ; //= right;
-	Vec4 arr[2]=up; //up 
+	return result;	
+}
 
-	Mat4 result;
-	for(int i=0;i=3;i++){
-		for(int j=0;j<4;++j)
-			result[j][i] = arr[i][j];
-	}
+inline Mat4 persp_projection(float L, float R, float T, float B, float N, float F){
+	Mat4 result = identity();
+	
+	result[0][0] = 2*N/(R-L), result[0][2] = (R+L)/(R-L);
+	result[1][1] = 2*N/(T-B), result[1][2] = (T+B)/(T-B);
+	result[2][2] = -(F+N)/(F-N), result[2][3] = -2*F*N/(F-N);
+	result[3][2] = -1;
+
 	return result;
 }
+
+
