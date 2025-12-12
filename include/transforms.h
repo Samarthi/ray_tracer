@@ -11,7 +11,7 @@ inline Vec4 vector(float x, float y, float z){
 	return result;
 }
 
-inline Mat4 translate(float tx, float ty, float tz){
+inline Mat4 mat_translate(float tx, float ty, float tz){
 	Mat4 result = identity();
 	result[0][3] = tx;
 	result[1][3] = ty;
@@ -19,7 +19,7 @@ inline Mat4 translate(float tx, float ty, float tz){
 	return result;
 }
 
-inline Mat4 scale(float sx, float sy, float sz){
+inline Mat4 mat_scale(float sx, float sy, float sz){
 	Mat4 result = identity();
 	result[0][0]=sx;
 	result[1][1]=sy;
@@ -27,7 +27,7 @@ inline Mat4 scale(float sx, float sy, float sz){
 	return result;
 }
 
-inline Mat4 rot_x(float theta){
+inline Mat4 mat_rot_x(float theta){
 	Mat4 result = identity();
 	float cosine = cos(theta), sine = sin(theta);
 	result[1][1] = cosine;
@@ -37,7 +37,7 @@ inline Mat4 rot_x(float theta){
 	return result;
 }
 
-inline Mat4 rot_y(float theta){
+inline Mat4 mat_rot_y(float theta){
 	Mat4 result = identity();
 	float cosine = cos(theta), sine = sin(theta);
 	result[0][0] = cosine;
@@ -47,7 +47,7 @@ inline Mat4 rot_y(float theta){
 	return result;
 }
 
-inline Mat4 rot_z(float theta){
+inline Mat4 mat_rot_z(float theta){
 	Mat4 result = identity();
 	float cosine = cos(theta), sine = sin(theta);
 	result[0][0] = cosine;
@@ -57,7 +57,7 @@ inline Mat4 rot_z(float theta){
 	return result;
 }
 
-inline Mat4 ortho_projection(float L, float R, float T, float B, float N, float F){
+inline Mat4 mat_ortho_projection(float L, float R, float T, float B, float N, float F){
 	Mat4 result = identity();
 	// camera points down negative z
 	//            scale factors            translational factors
@@ -68,7 +68,7 @@ inline Mat4 ortho_projection(float L, float R, float T, float B, float N, float 
 	return result;	
 }
 
-inline Mat4 persp_projection(float L, float R, float T, float B, float N, float F){
+inline Mat4 mat_persp_projection(float L, float R, float T, float B, float N, float F){
 	Mat4 result = identity();
 	
 	result[0][0] = 2*N/(R-L), result[0][2] = (R+L)/(R-L);
@@ -79,4 +79,12 @@ inline Mat4 persp_projection(float L, float R, float T, float B, float N, float 
 	return result;
 }
 
-
+inline Vec4 transform(const Vec4 &v, const Mat4 &m){
+	Vec4 result;
+	for(int i=0;i<4;++i){
+		result[i] = 0;
+		for(int j=0;j<4;++j)
+			result[i] += v[j]*m[i][j]; 
+	}
+	return result;
+}
