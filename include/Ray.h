@@ -12,7 +12,6 @@ struct Sphere{
 };
 
 struct Intersection{
-  int id;
   float t;
   Vec4 p, normal;
   Material *mat;
@@ -48,9 +47,7 @@ inline Vec4 ray_at(const Ray &r, float t){
   return r.origin + r.direction * t;
 }
  
-inline SphereIntersections intersect_sphere(const Ray &r, const Sphere &s){
-  SphereIntersections it;
-
+inline Intersection intersect_sphere(const Ray &r, const Sphere &s){  
   //uses implicit equation (O+tD-C)^2 - R^2 = 0
 
   //D^2t^2 + 2(O-C)D*t + (O-C)^2-R^2 = 0
@@ -63,26 +60,24 @@ inline SphereIntersections intersect_sphere(const Ray &r, const Sphere &s){
   float discriminant = b*b - 4*a*c;
   
   if (discriminant<0.0f){
-    it.hits = 0;
+    Intersection it = {0};
     return it;
   }
   
   float inv2a = 1.0f / (2.0f * a);
   
   if(float_eq(discriminant,0.0f)){
-    it.hits = 1;
-    it.hit1 = -b*inv2a;
-    return it;
+    Intersection it1.t = -b*inv2a;
+    return it1;
   }
   
-  it.hits = 2;
-  it.hit1 = (-b - sqrt(discriminant))*inv2a;
-  it.hit2 = (-b + sqrt(discriminant))*inv2a;
-  return it;
+  Intersection it1.t = (-b - sqrt(discriminant))*inv2a;
+  Intersection it2.t = (-b + sqrt(discriminant))*inv2a;
+  return it1.t<it2.t?it1:it2;
 }
 
-Intersection hit(const SphereIntersections &s){
-
+inline Vec4 normal_at(const Sphere &s, const Vec4 &p){
+  return p - s.origin;
 }
-Vec4 normal_at(const Sphere &s, const Vec4 &p);
+
 Vec4 reflect(const Vec4 &incident, const Vec4 &normal);
