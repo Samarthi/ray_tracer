@@ -52,6 +52,7 @@ struct SphereIntersections{
 struct SceneConfig{
   int object_count;
   Shape *shape;
+  Camera camera;
 };
 
 inline Vec4 ray_at(const Ray &r, float t){
