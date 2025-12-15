@@ -5,6 +5,12 @@ struct Ray {
   Vec4 origin, direction;
 };
 
+struct Sphere;
+
+union Shape{
+  Sphere sphere;
+};
+
 struct Sphere{
   int id;
   Vec4 center;
@@ -41,6 +47,11 @@ struct Camera{
 struct SphereIntersections{
   Intersection hit1, hit2;
   int hits;
+};
+
+struct SceneConfig{
+  int object_count;
+  Shape *shape;
 };
 
 inline Vec4 ray_at(const Ray &r, float t){
