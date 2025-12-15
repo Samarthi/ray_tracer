@@ -80,4 +80,6 @@ inline Vec4 normal_at(const Sphere &s, const Vec4 &p){
   return p - s.origin;
 }
 
-Vec4 reflect(const Vec4 &incident, const Vec4 &normal);
+inline Vec4 reflect(const Vec4 &incident, const Vec4 &normal){
+  return incident - normal * 2 * dot(incident, normal);
+}
