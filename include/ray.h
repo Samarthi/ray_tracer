@@ -1,9 +1,5 @@
 #include "vec.h"
 #include "math.h"
-#include "canvas.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include <string>
 
 struct Canvas{
 	int h,w;
@@ -97,57 +93,4 @@ inline Vec4 normal_at(const Sphere &s, const Vec4 &p){
 
 inline Vec4 reflect(const Vec4 &incident, const Vec4 &normal){
   return incident - normal * 2 * dot(incident, normal);
-}
-
-void canvas_to_ppm(const Canvas &canvas){
-  FILE *newstreamptr;
-  freopen_s(&newstreamptr, "scene.ppm", "w", stdout);
-  // write header
-  std::cout << "P3\n"
-            << canvas.w << ' ' << canvas.h << "\n255\n";
-  // write body
-  for (int i = 0; i < canvas.h; ++i){
-    for (int j = 0; j < canvas.w; ++j)
-      for (int k = 0; k < 3; ++k)
-        std::cout << (int)canvas.contents[i][j][k] << ' ';
-    std::cout << '\n';
-  }
-}
-
-bool is_empty_token(char c){
-  if(c==' ' || c=='\t' || c=='\n')
-    return true;
-  return false;
-}
-
-std::string trim(const std::string &s){
-  int start = 0, end = s.size();
-  while(start<s.size() && is_empty_token(s[start])) ++start;
-  while(end>=0 && is_empty_token(s[start])) --end;
-  return s.substr(start,end-start+1);
-}
-
-Canvas ppm_to_canvas(const char *ppm_path){
-  FILE* f = fopen(ppm_path,"r");
-  int height, width;
-  std::string line;
-  bool header = false; 
-  bool init = false;
-  while(getline(f, line)){
-    if (!header){
-      if (trim(line)=="P3") header = true;
-      continue; 
-    }
-    if (!init){
-      std::string trimmed = trim(line);
-      if(trimmed!=""){
-        int start = 0;
-        while (start<trimmed.size() && !is_empty_token(trimmed[start])) ++start;
-        height = std::stoi(trimmed.substr(0,start));
-        while(trimmed[start]==' ')
-
-      }
-    } 
-  }
-
 }
