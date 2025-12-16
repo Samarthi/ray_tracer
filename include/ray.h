@@ -1,49 +1,153 @@
-#pragma once
-#include "tuple.h"
-#include <vector>
-#include <unordered_map>
+#include "vec.h"
+#include "math.h"
+#include "canvas.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include <string>
 
-struct Material{
-	Tuple color=color3(1,1,1);
-	float ambient=0.1, 
-	diffuse=0.9,
-	specular=0.9,
-	shininess=200; 
+struct Canvas{
+	int h,w;
+	Vec3** contents;
 };
 
 struct Ray {
-  Tuple origin, direction;
+  Vec4 origin, direction;
 };
 
-struct Intersection {
-  int obj_id;
+struct Sphere{
+  int id;
+  Vec4 origin;
+  float radius;
+};
+
+struct Material{
+  Vec3 colour;
+  union{
+    struct{
+      float ambient, diffuse, specular, shininess;
+    };
+    float props[4];
+  };
+};
+
+struct Intersection{
   float t;
+  Vec4 p, normal;
+  Material *mat;
 };
-
-struct Sphere {
-  int obj_id;
-  Matrix<float> transform;
-  Material material;
-};
-
-Tuple ray_position(Ray r, float t);
-std::vector<Intersection>* intersect_sphere(Ray r, Sphere s, std::vector<Intersection> *p_intersection_list=nullptr);
-Intersection* hit(std::vector<Intersection>& v);
-Ray transform(Ray r, Matrix<float> m);
-void debug(std::vector<Intersection>& v);
-Tuple normal_at(Sphere s, Tuple p);
-Tuple reflect(Tuple in, Tuple normal);
 
 struct Light{
-	Tuple position,intensity;
+  Vec4 pos;
+  Vec3 intensity;
 };
 
-Tuple lighting(Material m, Light l, Tuple point, Tuple eye, Tuple normal);
-
-struct World{
-	std::vector<Light> light_source_list;
-	std::vector<Sphere> sphere_list;
+struct Camera{
+  Mat4 view;
+  Mat4 proj;
+  Vec4 origin;
 };
 
-World world();
-std::vector<Intersection>* intersect_world(Ray r, World w);
+struct SphereIntersections{
+  Intersection hit1, hit2;
+  int hits;
+};
+
+struct SceneConfig{
+  int object_count;
+  Sphere *shape;
+  Camera camera;
+};
+
+inline Vec4 ray_at(const Ray &r, float t){
+  return r.origin + r.direction * t;
+}
+ 
+inline Intersection intersect_sphere(const Ray &r, const Sphere &s){  
+  //uses implicit equation (O+tD-C)^2 - R^2 = 0
+
+  //D^2t^2 + 2(O-C)D*t + (O-C)^2-R^2 = 0
+  Vec4 oc = r.origin - s.origin;
+  float a = dot(r.direction, r.direction);
+  float b = 2*dot(r.origin - s.origin,r.direction);
+  float c = dot(oc, oc) - s.radius*s.radius; 
+  
+  //DISCRIMINANT  
+  float discriminant = b*b - 4*a*c;
+  
+  if (discriminant<0.0f){
+    Intersection it = {0};
+    return it;
+  }
+  
+  float inv2a = 1.0f / (2.0f * a);
+  
+  if(float_eq(discriminant,0.0f)){
+    Intersection it1; it1.t = -b*inv2a;
+    return it1;
+  }
+  
+  Intersection it1; it1.t = (-b - sqrt(discriminant))*inv2a;
+  Intersection it2; it2.t = (-b + sqrt(discriminant))*inv2a;
+  return it1.t<it2.t?it1:it2;
+}
+
+inline Vec4 normal_at(const Sphere &s, const Vec4 &p){
+  return p - s.origin;
+}
+
+inline Vec4 reflect(const Vec4 &incident, const Vec4 &normal){
+  return incident - normal * 2 * dot(incident, normal);
+}
+
+void canvas_to_ppm(const Canvas &canvas){
+  FILE *newstreamptr;
+  freopen_s(&newstreamptr, "scene.ppm", "w", stdout);
+  // write header
+  std::cout << "P3\n"
+            << canvas.w << ' ' << canvas.h << "\n255\n";
+  // write body
+  for (int i = 0; i < canvas.h; ++i){
+    for (int j = 0; j < canvas.w; ++j)
+      for (int k = 0; k < 3; ++k)
+        std::cout << (int)canvas.contents[i][j][k] << ' ';
+    std::cout << '\n';
+  }
+}
+
+bool is_empty_token(char c){
+  if(c==' ' || c=='\t' || c=='\n')
+    return true;
+  return false;
+}
+
+std::string trim(const std::string &s){
+  int start = 0, end = s.size();
+  while(start<s.size() && is_empty_token(s[start])) ++start;
+  while(end>=0 && is_empty_token(s[start])) --end;
+  return s.substr(start,end-start+1);
+}
+
+Canvas ppm_to_canvas(const char *ppm_path){
+  FILE* f = fopen(ppm_path,"r");
+  int height, width;
+  std::string line;
+  bool header = false; 
+  bool init = false;
+  while(getline(f, line)){
+    if (!header){
+      if (trim(line)=="P3") header = true;
+      continue; 
+    }
+    if (!init){
+      std::string trimmed = trim(line);
+      if(trimmed!=""){
+        int start = 0;
+        while (start<trimmed.size() && !is_empty_token(trimmed[start])) ++start;
+        height = std::stoi(trimmed.substr(0,start));
+        while(trimmed[start]==' ')
+
+      }
+    } 
+  }
+
+}
