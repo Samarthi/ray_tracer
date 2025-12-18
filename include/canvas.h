@@ -1,7 +1,8 @@
 #include "ray.h"
-#include "stdio.h"
-#include "stdlib.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
+#include <iostream>
 
 void canvas_to_ppm(const Canvas &canvas){
   FILE *newstreamptr;
@@ -62,14 +63,14 @@ std::string trim(const std::string &s){
 }
 
 Canvas ppm_to_canvas(const char *ppm_path){
-  FILE* f = fopen(ppm_path,"r");
+  auto f = freopen(ppm_path, "r", stdin);
   std::string line;
   bool header = false, init = false, high = false ;
   Canvas cnv;
   int row_count = 0, col_count = 0;
   const int MOD = 3;
 
-  while(getline(f, line)){
+  while(std::getline(f,line)){
     if (!header){
       if (trim(line)=="P3") header = true;
       continue; 

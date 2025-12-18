@@ -1,6 +1,4 @@
 #include <gtest/gtest.h> 
-#include "../include/vec.h"
-#include "../include/Ray.h"
 #include "../include/canvas.h"
 #include <cmath>
 

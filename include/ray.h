@@ -30,6 +30,7 @@ struct Intersection{
   float t;
   Vec4 p, normal;
   Material *mat;
+  bool tangent = false;
 };
 
 struct Light{
@@ -79,6 +80,7 @@ inline Intersection intersect_sphere(const Ray &r, const Sphere &s){
   
   if(float_eq(discriminant,0.0f)){
     Intersection it1; it1.t = -b*inv2a;
+    it1.tangent = true;
     return it1;
   }
   
