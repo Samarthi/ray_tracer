@@ -164,6 +164,7 @@ TEST(HelloTest, Geometry_Integration){
   Camera cam; cam.origin = {0.0, 0.0, 0.0,1.0};
   Sphere s; s.origin = {0.0, 0.0, 200.0, 1.0}; s.radius = 50.0; 
   float x_start = -height/2, y_start = -width/2, z = 200.0;
+  
   Vec3 black = {0.0, 0.0, 0.0}, white = {255, 255, 255};
   for(int i = 0; i < height; ++i)
     for (int j = 0; j < width; ++j){
@@ -173,5 +174,10 @@ TEST(HelloTest, Geometry_Integration){
         cnv.contents[i][j] = black;
       else cnv.contents[i][j] = white;
     }
-  
+   canvas_to_ppm(cnv, "scene.ppm");   
+}
+
+TEST(HelloTest, ReadPPM){
+  Canvas cnv = ppm_to_canvas("../data/boolean_sphere.ppm");
+  canvas_to_ppm(cnv, "scene.ppm");
 }
