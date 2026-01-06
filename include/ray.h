@@ -1,8 +1,12 @@
 #include "vec.h"
-#include "cmath"
+#include "math.h"
+
+struct Canvas{
+	int h,w;
+	Vec3** contents;
+};
 
 struct Ray {
-  Vec4 origin, direction;
 };
 
 struct Material;
@@ -27,8 +31,6 @@ struct Object{
 };
 
 struct Light{
-  Vec4 pos;
-  Vec3 intensity;
 };
 
 struct Material{
