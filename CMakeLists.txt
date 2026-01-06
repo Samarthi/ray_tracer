@@ -22,9 +22,9 @@ add_executable(
 )
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-target_link_libraries(
-    main PRIVATE lib
-)
+# target_link_libraries(
+#    main PRIVATE lib
+# )
 target_include_directories(main PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
 
@@ -36,7 +36,7 @@ add_executable(
 )
 
 target_link_libraries(
-    hello_test PRIVATE lib
+    hello_test # PRIVATE lib
     GTest::gtest_main
 )
 target_include_directories(hello_test PUBLIC "${PROJECT_SOURCE_DIR}/include")

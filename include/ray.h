@@ -6,15 +6,24 @@ struct Canvas{
 	Vec3** contents;
 };
 
-struct Ray {
+struct Material{
+  Vec4 colour;
+  union{
+    struct{
+      float ambient, diffuse, specular, shininess;
+    };
+    float props[4];
+  };
 };
 
-struct Material;
+struct Ray {
+  Vec4 origin, direction;
+};
+
 // negative t indicates no intersection
 struct Intersection{
   float t;
   Vec4 p, normal;
-  Material *mat;
 };
 
 union Triangle{
@@ -28,20 +37,12 @@ union Triangle{
 struct Object{
   int triangle_count;
   Triangle **triangles;
+  Material material;
 };
 
 struct Light{
 };
 
-struct Material{
-  Vec4 colour;
-  union{
-    struct{
-      float ambient, diffuse, specular, shininess;
-    };
-    float props[4];
-  };
-};
 
 struct Camera{
   Mat4 view;
@@ -84,7 +85,8 @@ inline Intersection intersect_triangle(const Triangle &tr, const Ray &r){
   if (t < 0.0f) return it;
   
   it.t = t;
-  it.p = ray_at(r,t);
+  it.p = ray_at(r, t);
+  it.normal = p - cross(e, f);
   return it;
 
 }
