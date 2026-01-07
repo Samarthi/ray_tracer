@@ -1,6 +1,10 @@
 #include "vec.h"
 #include "math.h"
 
+inline max(float a, float b){
+  return a>b?a:b;
+}
+
 struct Canvas{
 	int h,w;
 	Vec3** contents;
@@ -41,6 +45,8 @@ struct Object{
 };
 
 struct Light{
+  Vec4 position;
+  Vec3 color;
 };
 
 
@@ -54,6 +60,7 @@ struct SceneConfig{
   int object_count;
   Object **objects;
   Camera camera;
+  Light light;
 };
 
 inline Vec4 ray_at(const Ray &r, float t){
@@ -86,7 +93,7 @@ inline Intersection intersect_triangle(const Triangle &tr, const Ray &r){
   
   it.t = t;
   it.p = ray_at(r, t);
-  it.normal = p - cross(e, f);
+  it.normal = norm(p - cross(e, f));
   return it;
 
 }
@@ -97,4 +104,23 @@ inline Vec4 normal_at(const Triangle &tr, const Vec4 &p){
 
 inline Vec4 reflect(const Vec4 &incident, const Vec4 &normal){
   return incident - normal * 2 * dot(incident, normal);
+}
+
+inline Vec3 shade(const Intersection &it, const Light &light, const Material &mat, const Camera &cam){
+  Vec3 color;
+  // light direction
+  Vec4 l_dir = norm(light.position - it.p);
+  Vec4 reflected = norm(reflect(l_dir, it.normal));
+  
+  // diffuse
+  float diffuse_intensity = dot(it.normal, l_dir)
+  Vec3 diffuse = mat.color * mat.diffuse * max(diffuse_intensity, 0);
+
+  // specular
+  Vec3 specular = mat.color * mat.specular * pow(max(0, dot(reflected, norm(cam.origin - it.p))), shininess);
+
+  // ambient
+  Vec3 ambient = mat.color * mat.ambient;
+
+  return diffuse+specular+ambient;
 }
