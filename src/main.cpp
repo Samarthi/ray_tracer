@@ -7,7 +7,6 @@ int main(){
 	//============================================================================================
 	
 	// Objects
-
 	int sphere_count = 2;
 	Sphere *sp = (Sphere*)malloc(sphere_count * sizeof(Sphere));
 	
@@ -29,6 +28,29 @@ int main(){
 
 	//Action
 	SceneConfig scene = {0, nullptr, sphere_count, sp, cam, light_count, lights};
+	
+
+	//===========================================================================================
+
+	int height=500, width=500;
+  	Canvas cnv; cnv.h = height; cnv.w = width; cnv.contents =(Vec3**)calloc(height, sizeof(Vec3*));
+  	for(int i=0;i<height;++i)
+  		cnv.contents[i] = (Vec3*)calloc(width, sizeof(Vec3));
+
+  	float x_start = -height/2, y_start = -width/2, z = 200.0;
+ 
+  	for(int i = 0; i < height; ++i){
+  		for (int j = 0; j < width; ++j){
+      		Ray r; r.origin = cam.origin; r.direction = {x_start+i, y_start+j, z};
+      		cnv.contents[i][j] = intersect_scene(r, scene);
+      	}
+    }
+	canvas_to_ppm(cnv, "../assets/scene.ppm");
+
+
+
+
+
 
 	return 0;
 }
