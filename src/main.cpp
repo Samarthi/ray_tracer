@@ -24,10 +24,11 @@ int main(){
 	//Lights, Camera
 	Camera cam; cam.origin = {0.0, 0.0, 0.0, 0.0};
 	int light_count = 1;
-	Light l = {{10.0f, 0.0f, 20.0f, 0.0f}, {200, 200, 200}};  	
+	Light *lights = (Light*)malloc(light_count * sizeof(Light));
+	lights[0] = {{10.0f, 0.0f, 20.0f, 0.0f}, {200, 200, 200}};  	
 
 	//Action
 	SceneConfig scene = {0, nullptr, sphere_count, sp, cam, light_count, lights};
-	
 
+	return 0;
 }
