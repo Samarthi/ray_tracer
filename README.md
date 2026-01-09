@@ -14,6 +14,5 @@ An under-development serious ray tracer.
 - Multi-threading execution
 
 ## Gallery
-![/assets/scene.png](https://github.com/Samarthi/ray_tracer/blob/main/assets/scene1.png)
 
 ![/assets/scene2.png](https://github.com/Samarthi/ray_tracer/blob/main/assets/scene2.png)
