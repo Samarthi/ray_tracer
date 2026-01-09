@@ -32,7 +32,7 @@ int main(){
 
 	//===========================================================================================
 
-	int height = 1000, width = 1000, ns = 100;
+	int height = 1000, width = 1000, ns = 10;
   	
   	Canvas cnv; cnv.h = height; cnv.w = width; cnv.contents = (Vec3**)calloc(height, sizeof(Vec3*));
   	for(int i = 0; i < height; ++i)
@@ -42,10 +42,13 @@ int main(){
  
   	for(int i = 0; i < height; ++i){
   		for (int j = 0; j < width; ++j){
-      		Ray r; 
-      		r.origin = cam.origin; 
-      		r.direction = {x_start+i, y_start+j, z};
-      		cnv.contents[i][j] = intersect_scene(r, scene);
+      		for(int k = 0; k < ns; ++k){
+	      		Ray r; 
+	      		r.origin = cam.origin; 
+	      		r.direction = {x_start+i+drand48(), y_start+j+drand48(), z};
+	      		cnv.contents[i][j] += intersect_scene(r, scene);
+	      	}
+	      	cnv.contents[i][j]/=ns;
       	}
     }
 	canvas_to_ppm(cnv, "../assets/scene.ppm");
