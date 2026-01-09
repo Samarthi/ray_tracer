@@ -6,6 +6,11 @@
 #include <fstream>
 #include <vector>
 
+struct Canvas{
+  int h,w;
+  Vec3** contents;
+};
+
 void canvas_to_ppm(const Canvas &canvas, const char * path){
   std::ofstream outf(path);
   // write header
