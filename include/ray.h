@@ -1,6 +1,7 @@
 #pragma once
 #include "vec.h"
 #include "math.h"
+#include "iostream"
 
 #define T_MAX 0x7f7fffff
 
@@ -39,6 +40,7 @@ union Triangle{
   };
   
   Vec4 vertices[3];
+  const Material* mat;
 };
 
 struct Sphere{
@@ -49,8 +51,7 @@ struct Sphere{
 
 struct Object{
   int triangle_count;
-  Triangle *triangles;
-  Material material;
+  const Triangle *triangles;
 };
 
 struct Light{
@@ -81,12 +82,12 @@ inline Vec4 ray_at(const Ray &r, float t){
   return r.origin + r.direction * t;
 }
 
-inline Vec4 normal_at_tr(const Triangle &tr, const Vec4 &p){
-  return p - cross(tr.v2 - tr.v0, tr.v1 - tr.v0);
+inline Vec4 normal_at_tr(const Triangle &tr ){
+  return norm(cross(tr.v1 - tr.v0, tr.v2 - tr.v0));
 }
 
 inline Vec4 normal_at_sph(const Sphere &sph, const Vec4 &p){
-  return p - sph.origin;
+  return norm(p - sph.origin);
 }
 
 inline Intersection intersect_sphere(const Ray &r, const Sphere &s){
@@ -96,7 +97,7 @@ inline Intersection intersect_sphere(const Ray &r, const Sphere &s){
   
   Vec4 oc = r.origin - s.origin;
   float a = dot(r.direction, r.direction);
-  float b = 2 * dot(r.origin - s.origin,r.direction);
+  float b = 2 * dot(oc ,r.direction);
   float c = dot(oc, oc) - s.radius * s.radius; 
   
   Intersection it;
@@ -109,9 +110,14 @@ inline Intersection intersect_sphere(const Ray &r, const Sphere &s){
   }
   
   float inv2a = 1.0f / (2.0f * a);
-
+  float root_d = sqrt(discriminant);
   if(float_eq(discriminant, 0.0f)) it.t = -b * inv2a;
-  else it.t = min((-b - sqrt(discriminant)), (-b + sqrt(discriminant))) * inv2a;
+  else {
+    float low = (-b - root_d);
+    if (!float_eq(low, 0) and low > 0.0f) it.t = low; 
+    else it.t = (-b + root_d);
+    it.t *= inv2a;
+  }
   it.p = ray_at(r, it.t);
   it.normal = normal_at_sph(s, it.p);
   it.mat = &s.mat;
@@ -144,7 +150,8 @@ inline Intersection intersect_triangle(const Ray &r, const Triangle &tr){
   
   it.t = t;
   it.p = ray_at(r, t);
-  it.normal = normal_at_tr(tr, p);
+  it.normal = normal_at_tr(tr);
+  it.mat = tr.mat;
   return it;
 
 }
@@ -153,25 +160,54 @@ inline Vec4 reflect(const Vec4 &incident, const Vec4 &normal){
   return incident - normal * 2 * dot(incident, normal);
 }
 
-inline Vec3 shade(const Intersection &it, int light_count, const Light *lights, const Camera &cam){
+inline Vec3 shade(const Intersection &it, const SceneConfig &sc){
   Vec3 colour = {0,0,0};
-  float inv_light_count = 1/light_count;
-  for(int i = 0; i < light_count; ++i){
-    // light direction
-    Vec4 l_dir = norm(lights[i].position - it.p);
-    Vec4 reflected = norm(reflect(l_dir, it.normal));
-    Material mat = *it.mat;
+  for(int i = 0; i < sc.light_count; ++i){
     
+    // light direction
+    Vec4 l_dir = norm(sc.lights[i].position - it.p);
+    bool shadow = false;
+    Ray shadow_ray = {it.p + it.normal * EQ, l_dir};
+    
+    for(int j = 0; j < sc.object_count; ++j){
+      for (int k = 0; k < sc.objects[j].triangle_count; ++k){
+        Intersection temp = intersect_triangle(shadow_ray, sc.objects[j].triangles[k]);
+        if ( !float_eq(temp.t, 0.0f) and temp.t > 0.0f){
+          shadow = true; break; 
+        }
+      }
+      if(shadow) break;
+    }
+    if(!shadow)
+    {
+      for(int j = 0; j < sc.sphere_count; ++j){
+          Intersection temp = intersect_sphere(shadow_ray, sc.spheres[j]);
+          if ( !float_eq(temp.t, 0.0f) and temp.t > 0.0f){
+            shadow = true; break; 
+          }
+        if(shadow) break;
+      }
+    }
+
+    Material mat = *it.mat;
+    // ambient
+    Vec3 ambient = sc.lights[i].ambient_colour * mat.ambient;
+
+    if(shadow){
+      colour += ambient; 
+      continue;
+    }
+
+    Vec4 reflected = norm(reflect(-l_dir, it.normal));
+       
     // diffuse
     float diffuse_intensity = dot(it.normal, l_dir);
     Vec3 diffuse = mat.colour * mat.diffuse * max(diffuse_intensity, 0);
 
     // specular
-    Vec3 specular = mat.colour * mat.specular * pow(max(0, dot(reflected, norm(cam.origin - it.p))), mat.shininess);
+    Vec3 specular = mat.colour * mat.specular * pow(max(0, dot(reflected, norm(sc.camera.origin - it.p))), mat.shininess);
 
-    // ambient
-    Vec3 ambient = lights[i].ambient_colour * mat.ambient;
-    colour =  (diffuse + specular + ambient) * inv_light_count;
+    colour +=  (diffuse + specular + ambient);
   }
   return colour;
 }
@@ -180,19 +216,25 @@ inline Vec3 intersect_scene(const Ray &r, const SceneConfig &sc){
   float t = T_MAX;
   Intersection it;
   for(int i = 0; i < sc.sphere_count; ++i){
-    Intersection temp = intersect_sphere(r, sc.spheres[0]);
-    if (t > 0 && t > temp.t) it = temp;
+    Intersection temp = intersect_sphere(r, sc.spheres[i]);
+    if (!float_eq(temp.t, 0.0f) && temp.t > 0.0f && t > temp.t){
+      it = temp;
+      t = temp.t;
+    }
   }
   
   for(int i = 0; i < sc.object_count; ++i){
     for(int j = 0; j < sc.objects[i].triangle_count; ++j){
       Intersection temp = intersect_triangle(r, sc.objects[i].triangles[j]);
-      if (t > 0 && t > temp.t) it = temp;
+      if (!float_eq(temp.t, 0.0f) && temp.t > 0.0f && t > temp.t){ 
+        it = temp;
+        t = temp.t;
+      }
     }
   }
   
   if (t == T_MAX)
     return {0.0, 0.0, 0.0};
   
-  return shade(it, sc.light_count, sc.lights, sc.camera);
+  return shade(it, sc);
 }
