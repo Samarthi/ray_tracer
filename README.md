@@ -12,6 +12,7 @@ An under-development serious ray tracer.
 - Switch from Phong to physically based illumination models
 - BVH support
 - Multi-threading execution
+- Interactive camera movement and config
 
 ## Gallery
 
