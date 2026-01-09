@@ -1,2 +1,14 @@
-# ray_tracer
-A simple ray tracer, which might or might not be a part of a game-engine later.
+# A Ray Tracer 
+An under-development serious ray tracer.
+
+## Current Features
+- Supports spheres and triangles
+- Supports anti-aliasing
+- Uses the Phong reflection model and has shadow simulation
+- Outputs ppm files
+
+## Upcoming Features
+- Reflection and refraction
+- Switch from Phong to physically based illumination models
+- BVH support
+- Multi-threading execution
