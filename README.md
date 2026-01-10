@@ -1,5 +1,5 @@
 # A Ray Tracer 
-An under-development serious ray tracer.
+An under-development CPU ray tracer.
 
 ## Current Features
 - Supports spheres and triangles
