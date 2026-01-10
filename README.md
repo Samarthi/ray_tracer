@@ -8,11 +8,15 @@ An under-development serious ray tracer.
 - Outputs ppm files
 
 ## Upcoming Features
-- Reflection and refraction
-- Switch from Phong to physically based illumination models
-- BVH support
-- Multi-threading execution
-- Interactive camera movement and config
+- [ ] Reflection and refraction
+- [ ] Switch from Phong to physically based illumination models
+- [ ] BVH support
+- [ ] Multi-threading execution
+- [ ] Interactive camera movement and config
+
+## Future Roadmap
+- [ ] Fog and Volumes
+- [ ] Monte Carlo Sampling
 
 ## Gallery
 
